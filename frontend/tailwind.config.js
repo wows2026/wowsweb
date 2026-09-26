@@ -13,7 +13,7 @@ module.exports = {
         display: ['"Helvetica Now Display"', '"Helvetica Neue"', 'Helvetica', 'Arial', 'sans-serif'],
         sans: ['"Helvetica Now Display"', '"Helvetica Neue"', 'Helvetica', 'Arial', 'sans-serif'],
         script: ['"Pinyon Script"', 'cursive'],
-        mono: ["JetBrains Mono", "monospace"],
+        mono: ['"Helvetica Now Display"', '"Helvetica Neue"', 'Helvetica', 'Arial', 'sans-serif'],
       },
       colors: {
         wino: {

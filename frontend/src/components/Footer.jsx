@@ -1,6 +1,5 @@
 import { motion } from "framer-motion";
 import { useLanguage } from "@/i18n";
-import Logo from "@/components/Logo";
 
 export default function Footer() {
   const { t } = useLanguage();
@@ -15,10 +14,7 @@ export default function Footer() {
     <footer id="contact" data-testid="footer" className="bg-[#0D0D0D] px-5 pt-16 pb-8 text-zinc-300 sm:px-8">
       <div className="mb-14 grid grid-cols-1 gap-12 lg:grid-cols-[1.4fr_1fr]">
         <div>
-          <div className="flex items-center gap-3">
-            <Logo className="h-9 w-9 [&_path]:stroke-[#FAF9F6]" />
-            <span className="font-display text-2xl font-extrabold tracking-tight text-[#FAF9F6]">WINORWINS</span>
-          </div>
+          <img src="/logo-main-white.png" alt="WINORWINS" className="h-11 w-auto sm:h-14" />
           <p className="mt-5 max-w-sm font-mono text-[11px] leading-relaxed tracking-[0.15em] text-zinc-500">
             VICTORY IN EVERY FIBER. HEAVYWEIGHT ESSENTIALS, LIMITED RUNS, NO RESTOCKS.
           </p>

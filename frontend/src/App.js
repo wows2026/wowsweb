@@ -51,7 +51,7 @@ export default function App() {
               color: "#FAF9F6",
               border: "1px solid #FFE600",
               borderRadius: 0,
-              fontFamily: "JetBrains Mono, monospace",
+              fontFamily: '"Helvetica Now Display", "Helvetica Neue", Helvetica, Arial, sans-serif',
               fontSize: "12px",
               letterSpacing: "0.05em",
             },

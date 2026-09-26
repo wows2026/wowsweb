@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useLanguage } from "@/i18n";
-import Logo from "@/components/Logo";
 
 export function scrollToSection(id) {
   const el = document.querySelector(id);
@@ -46,8 +45,7 @@ export default function Navbar() {
           }}
           className="flex items-center gap-2.5"
         >
-          <Logo className="h-7 w-7" />
-          <span className="font-display text-lg leading-none font-extrabold tracking-tight">WINORWINS</span>
+          <img src="/logo-main-black.png" alt="WINORWINS" className="h-9 w-auto sm:h-10" />
         </a>
 
         <div className="hidden items-center gap-8 md:flex">

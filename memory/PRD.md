@@ -45,6 +45,12 @@ User choices: light minimalist design with a few yellow details; hero section wi
 - Hero quote replaced with "THERE'S NO LOSING. ONLY LEARNING OR Winning" — smaller, left-aligned; "Winning" in Pinyon Script with animated hand-drawn yellow circle; quote stays English in both languages
 - Typography switched from Anton/Archivo to Helvetica Now Display (cdnfonts) + Pinyon Script accent
 
+## Iteration 2026-09-26 (user feedback round 2)
+- ALL text now Helvetica Now Display (including former mono labels/nav/buttons/toasts); Pinyon Script remains ONLY on the hero "Winning" word
+- User supplied final logos: 15.webp = main logo (W + WINORWINS wordmark), 23.webp = W mark for marquee (both white-on-transparent; black versions generated via PIL)
+- Main logo placed: navbar (black), footer (white), favicon (W mark on paper bg, favicon.png)
+- Marquee: white W mark (logo-mark-white.png) repeating rightward, yellow diamond separators REMOVED per user request
+
 ## Backlog
 - P0: Real ambassador video content for social section (user to supply)
 - P1: Full e-commerce (product pages, cart, checkout) — products currently MOCKED (static data)
