@@ -60,6 +60,13 @@ Architecture: Emergent React frontend → FastAPI backend proxy → Shopify Stor
 - Prices/inventory always validated server-side via Shopify — frontend never trusts its own data
 - Verified: products list (2 test products), cart create/update/remove, discount code applicability, checkoutUrl, newsletter subscribe + 409 duplicate, E2E screenshots desktop+mobile
 
+## Multi-page + Product Detail (2026-09-26, user feedback round 4)
+- react-router-dom routes: / (landing), /collection, /product/:handle, /lookbook, /socials, /contact; ScrollToTop works with Lenis; navbar uses Link navigation
+- Product detail page per user reference: info LEFT (back link, title, description), image CENTER (+thumbnails), price + option selectors + ADD TO CART RIGHT; sold-out/disabled variants; data from Shopify (backend products query now includes description + allImages)
+- ProductCard extracted (shared by landing FeaturedProducts + CollectionPage); card click navigates to product page, "+" = quick add
+- Marquee: YELLOW background with black logo marks (was black bg)
+- Footer: YELLOW background, black text/wordmark, yellow dot removed (was dark)
+
 ## Iteration 2026-09-26 (user feedback round 3)
 - Hero: quote enlarged (text-6xl desktop), removed "DROP 001 — LIVE NOW" eyebrow, removed subtext, meta bar now shows only centered SCROLL indicator (PRG—LDN—TYO and 500 GSM removed)
 - Removed eyebrows: FEATURED // DROP 001 (products), CAMPAIGN 01 (lookbook), COMMUNITY (social), // NEWSLETTER (newsletter)

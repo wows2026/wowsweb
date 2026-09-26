@@ -23,12 +23,24 @@ export const translations = {
     },
     products: {
       title: "BUILT FOR THE RELENTLESS",
+      collectionTitle: "FULL COLLECTION",
       viewAll: "FULL COLLECTION",
       comingSoon: "Full collection drops soon. Join the club to get notified.",
       colour: "Colour",
       colours: "Colours",
       empty: "NEW DROP COMING SOON",
       loadError: "PRODUCTS TEMPORARILY UNAVAILABLE",
+    },
+    product: {
+      back: "BACK",
+      addToCart: "ADD TO CART",
+      notFound: "PRODUCT NOT FOUND",
+      notFoundSub: "This piece is gone or never existed.",
+    },
+    contact: {
+      title: "CONTACT",
+      sub: "Orders, collabs or press — write us.",
+      follow: "FOLLOW US",
     },
     lookbook: {
       title: "THE ARCHITECTURE OF WINNING",
@@ -96,12 +108,24 @@ export const translations = {
     },
     products: {
       title: "BUILT FOR THE RELENTLESS",
+      collectionTitle: "CELÁ KOLEKCE",
       viewAll: "CELÁ KOLEKCE",
       comingSoon: "Celá kolekce vychází brzy. Připoj se do klubu a dozvíš se to první.",
       colour: "Barva",
       colours: "Barvy",
       empty: "NOVÝ DROP JIŽ BRZY",
       loadError: "PRODUKTY JSOU DOČASNĚ NEDOSTUPNÉ",
+    },
+    product: {
+      back: "ZPĚT",
+      addToCart: "PŘIDAT DO KOŠÍKU",
+      notFound: "PRODUKT NENALEZEN",
+      notFoundSub: "Tenhle kus je pryč, nebo nikdy neexistoval.",
+    },
+    contact: {
+      title: "KONTAKT",
+      sub: "Objednávky, spolupráce nebo press — napiš nám.",
+      follow: "SLEDUJ NÁS",
     },
     lookbook: {
       title: "ARCHITEKTURA VÍTĚZSTVÍ",

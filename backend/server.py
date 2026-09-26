@@ -42,6 +42,7 @@ query Products($first: Int!) {
         id
         handle
         title
+        description
         tags
         images(first: 4) { edges { node { url altText } } }
         options { name values }
@@ -277,6 +278,7 @@ def _map_product(node: dict) -> dict:
         "id": node["id"],
         "handle": node["handle"],
         "name": node["title"],
+        "description": node.get("description") or "",
         "badge": node["tags"][0] if node.get("tags") else None,
         "colorway": " / ".join(color_values) if color_values else (variants[0]["title"] if variants else ""),
         "colors": colors,
@@ -285,6 +287,7 @@ def _map_product(node: dict) -> dict:
             "main": images[0] if images else None,
             "hover": images[1] if len(images) > 1 else (images[0] if images else None),
         },
+        "allImages": images,
         "price": variants[0]["price"] if variants else None,
         "compareAtPrice": variants[0]["compareAtPrice"] if variants else None,
         "variants": variants,

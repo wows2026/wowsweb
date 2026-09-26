@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import Lenis from "lenis";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { Toaster } from "sonner";
 import "@/App.css";
 import { LanguageProvider } from "@/i18n";
@@ -13,6 +14,33 @@ import Social from "@/components/Social";
 import Newsletter from "@/components/Newsletter";
 import Footer from "@/components/Footer";
 import CartDrawer from "@/components/CartDrawer";
+import CollectionPage from "@/pages/CollectionPage";
+import ProductPage from "@/pages/ProductPage";
+import LookbookPage from "@/pages/LookbookPage";
+import SocialsPage from "@/pages/SocialsPage";
+import ContactPage from "@/pages/ContactPage";
+
+function Landing() {
+  return (
+    <main>
+      <Hero />
+      <Marquee />
+      <FeaturedProducts />
+      <Lookbook />
+      <Social />
+      <Newsletter />
+    </main>
+  );
+}
+
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    if (window.__lenis) window.__lenis.scrollTo(0, { immediate: true });
+    else window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+}
 
 export default function App() {
   useEffect(() => {
@@ -34,34 +62,38 @@ export default function App() {
   return (
     <LanguageProvider>
       <CartProvider>
-        <div className="min-h-screen bg-[#FAF9F6] font-sans text-[#0D0D0D] antialiased">
-          <div className="grain" aria-hidden="true" />
-          <Navbar />
-          <main>
-            <Hero />
-            <Marquee />
-            <FeaturedProducts />
-            <Lookbook />
-            <Social />
-            <Newsletter />
-          </main>
-          <Footer />
-          <CartDrawer />
-          <Toaster
-            position="bottom-center"
-            toastOptions={{
-              style: {
-                background: "#0D0D0D",
-                color: "#FAF9F6",
-                border: "1px solid #FFE600",
-                borderRadius: 0,
-                fontFamily: '"Helvetica Now Display", "Helvetica Neue", Helvetica, Arial, sans-serif',
-                fontSize: "12px",
-                letterSpacing: "0.05em",
-              },
-            }}
-          />
-        </div>
+        <BrowserRouter>
+          <ScrollToTop />
+          <div className="min-h-screen bg-[#FAF9F6] font-sans text-[#0D0D0D] antialiased">
+            <div className="grain" aria-hidden="true" />
+            <Navbar />
+            <Routes>
+              <Route path="/" element={<Landing />} />
+              <Route path="/collection" element={<CollectionPage />} />
+              <Route path="/product/:handle" element={<ProductPage />} />
+              <Route path="/lookbook" element={<LookbookPage />} />
+              <Route path="/socials" element={<SocialsPage />} />
+              <Route path="/contact" element={<ContactPage />} />
+              <Route path="*" element={<Landing />} />
+            </Routes>
+            <Footer />
+            <CartDrawer />
+            <Toaster
+              position="bottom-center"
+              toastOptions={{
+                style: {
+                  background: "#0D0D0D",
+                  color: "#FAF9F6",
+                  border: "1px solid #FFE600",
+                  borderRadius: 0,
+                  fontFamily: '"Helvetica Now Display", "Helvetica Neue", Helvetica, Arial, sans-serif',
+                  fontSize: "12px",
+                  letterSpacing: "0.05em",
+                },
+              }}
+            />
+          </div>
+        </BrowserRouter>
       </CartProvider>
     </LanguageProvider>
   );

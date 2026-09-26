@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { ShoppingBag } from "lucide-react";
 import { useLanguage } from "@/i18n";
 import { useCart } from "@/shop";
@@ -23,10 +24,10 @@ export default function Navbar() {
   }, []);
 
   const links = [
-    { id: "#collection", label: t.nav.collection, testid: "nav-link-collection" },
-    { id: "#lookbook", label: t.nav.lookbook, testid: "nav-link-lookbook" },
-    { id: "#community", label: t.nav.community, testid: "nav-link-community" },
-    { id: "#contact", label: t.nav.contact, testid: "nav-link-contact" },
+    { to: "/collection", label: t.nav.collection, testid: "nav-link-collection" },
+    { to: "/lookbook", label: t.nav.lookbook, testid: "nav-link-lookbook" },
+    { to: "/socials", label: t.nav.community, testid: "nav-link-community" },
+    { to: "/contact", label: t.nav.contact, testid: "nav-link-contact" },
   ];
 
   const count = cart?.totalQuantity || 0;
@@ -40,34 +41,21 @@ export default function Navbar() {
       }`}
     >
       <nav className="flex h-16 items-center justify-between px-5 sm:px-8">
-        <a
-          href="#top"
-          data-testid="nav-logo"
-          onClick={(e) => {
-            e.preventDefault();
-            if (window.__lenis) window.__lenis.scrollTo(0);
-            else window.scrollTo({ top: 0, behavior: "smooth" });
-          }}
-          className="flex items-center"
-        >
+        <Link to="/" data-testid="nav-logo" className="flex items-center">
           <img src="/logo-main-black.png" alt="WINORWINS" className="h-9 w-auto sm:h-10" />
-        </a>
+        </Link>
 
         <div className="hidden items-center gap-8 md:flex">
           {links.map((l) => (
-            <a
-              key={l.id}
-              href={l.id}
+            <Link
+              key={l.to}
+              to={l.to}
               data-testid={l.testid}
-              onClick={(e) => {
-                e.preventDefault();
-                scrollToSection(l.id);
-              }}
               className="group relative font-mono text-[11px] font-medium tracking-[0.2em] text-zinc-700 transition-colors hover:text-black"
             >
               {l.label}
               <span className="absolute -bottom-1 left-0 h-[2px] w-0 bg-[#FFE600] transition-[width] duration-300 group-hover:w-full" />
-            </a>
+            </Link>
           ))}
         </div>
 
