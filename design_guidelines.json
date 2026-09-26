@@ -1,0 +1,81 @@
+{
+  "project_name": "WINORWINS",
+  "app_type": "landing_page",
+  "brand_identity": {
+    "name": "WINORWINS",
+    "tagline": "VICTORY OR NOTHING",
+    "niche": "High-end Minimalist Streetwear (Represent / Nocta / Mertra aesthetic with Teya.com kinetic motion)",
+    "aesthetic": "Light Minimalist (#FAF9F6 base) with high-contrast sharp typography, muted luxury concrete tones, and electric yellow (#FFE500) accents"
+  },
+  "hero_video_assets": {
+    "primary_hero_video_url": "https://assets.mixkit.co/videos/42898/42898-720.mp4",
+    "secondary_hero_video_url": "https://assets.mixkit.co/videos/42894/42894-720.mp4",
+    "tertiary_hero_video_url": "https://assets.mixkit.co/videos/4621/4621-720.mp4",
+    "high_res_1080p_video_url": "https://assets.mixkit.co/videos/42898/42898-1080.mp4",
+    "fallback_poster_image_url": "https://images.unsplash.com/photo-1615397587950-3cbb55f95b77?crop=entropy&cs=srgb&fm=jpg&q=85",
+    "verification_status": "Verified HTTP 200 / 206 with Content-Type: video/mp4",
+    "video_display_specs": {
+      "autoplay": true,
+      "loop": true,
+      "muted": true,
+      "playsInline": true,
+      "objectFit": "cover",
+      "overlay": "bg-black/25 mix-blend-multiply or gradient-to-t from-[#FAF9F6] via-transparent to-black/30"
+    }
+  },
+  "image_urls": {
+    "hero_fallback": "https://images.unsplash.com/photo-1615397587950-3cbb55f95b77?crop=entropy&cs=srgb&fm=jpg&q=85",
+    "model_white_hoodie_1": "https://images.unsplash.com/photo-1615397587950-3cbb55f95b77?crop=entropy&cs=srgb&fm=jpg&q=85",
+    "model_grey_hoodie_2": "https://images.unsplash.com/photo-1564557287817-3785e38ec1f5?crop=entropy&cs=srgb&fm=jpg&q=85",
+    "model_white_hoodie_3": "https://images.unsplash.com/photo-1688111421205-a0a85415b224?crop=entropy&cs=srgb&fm=jpg&q=85",
+    "editorial_couple_urban": "https://images.unsplash.com/photo-1594035795389-9363dd86b113?crop=entropy&cs=srgb&fm=jpg&q=85",
+    "editorial_street_model": "https://images.unsplash.com/photo-1612029938221-a01e8c947edb?crop=entropy&cs=srgb&fm=jpg&q=85",
+    "editorial_denim_wall": "https://images.unsplash.com/photo-1518590713842-629f89f09c9f?crop=entropy&cs=srgb&fm=jpg&q=85",
+    "editorial_jacket_model": "https://images.unsplash.com/photo-1541980161-32fe8af73880?crop=entropy&cs=srgb&fm=jpg&q=85"
+  },
+  "colors": {
+    "background": "#FAF9F6",
+    "surface": "#FFFFFF",
+    "surface_subtle": "#F3F2EE",
+    "text_primary": "#0D0D0D",
+    "text_secondary": "#555555",
+    "text_muted": "#888888",
+    "accent_yellow": "#FFE500",
+    "accent_yellow_hover": "#E6CE00",
+    "accent_yellow_light": "#FFF9A6",
+    "border_light": "#E5E3DC",
+    "border_dark": "#1A1A1A",
+    "dark_card": "#111111"
+  },
+  "typography": {
+    "headline_font": "Syne, Anton, or Barlow Condensed for high-impact streetwear display headers",
+    "body_font": "Plus Jakarta Sans, Figtree, or Inter for clean legible body and specs",
+    "mono_font": "JetBrains Mono for tech labels, collection codes, coordinates, and product SKUs",
+    "h1_hero": "text-5xl sm:text-7xl lg:text-8xl font-black uppercase tracking-tighter leading-none",
+    "h2_section": "text-3xl sm:text-5xl font-extrabold uppercase tracking-tight",
+    "overlines": "text-xs uppercase tracking-[0.3em] font-mono font-bold text-[#FFE500]"
+  },
+  "layout_and_grids": {
+    "bento_grid": "grid-cols-1 md:grid-cols-12 gap-6 lg:gap-8",
+    "container_padding": "px-4 sm:px-8 lg:px-16",
+    "section_spacing": "py-24 lg:py-36",
+    "header_nav": "fixed top-0 left-0 w-full z-50 backdrop-blur-md bg-[#FAF9F6]/80 border-b border-[#E5E3DC]"
+  },
+  "motion_and_interactions": {
+    "style": "TEYA.COM British version kinetic motion — snappy, weighted, smooth marquee streams, interactive hover state image swaps, subtle magnetic cursor buttons",
+    "animations": [
+      "Smooth Lenis scroll integration",
+      "Framer Motion staggered entry for collection grids",
+      "Kinetic marquee text ticker moving horizontally",
+      "Product card zoom & video-hover preview",
+      "Quick-add drawer modal with fluid transitions"
+    ]
+  },
+  "UNIVERSAL GUIDELINES FOR MAIN AGENT": [
+    "Always set data-testid on interactive buttons, links, search inputs, modal triggers, and cart elements",
+    "Header must be sticky/fixed with backdrop-blur and visible desktop nav items (not behind hamburger menu)",
+    "Hero section MUST use the verified replacement mp4 video URLs with muted autoplay loop",
+    "Do NOT use pure #000000 gradients for background. Keep the site light minimalist (#FAF9F6) with electric yellow (#FFE500) accents",
+    "Ensure high contrast on text buttons and hover states"
+  ]
+}
