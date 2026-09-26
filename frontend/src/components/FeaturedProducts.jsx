@@ -20,17 +20,6 @@ export default function FeaturedProducts() {
     <section id="collection" data-testid="featured-products-section" className="px-5 py-20 sm:px-8 sm:py-28">
       <div className="mb-12 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <motion.p
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="mb-4 flex items-center gap-2 font-mono text-[11px] font-bold tracking-[0.25em] text-zinc-500"
-            data-testid="products-eyebrow"
-          >
-            <span className="inline-block h-2 w-2 bg-[#FFE600]" />
-            {t.products.eyebrow}
-          </motion.p>
           <MaskedTitle
             testid="products-title"
             className="font-display text-3xl leading-none font-extrabold tracking-tight uppercase sm:text-5xl"

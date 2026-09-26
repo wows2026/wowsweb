@@ -17,17 +17,6 @@ export default function Lookbook() {
       className="border-y border-zinc-200 bg-[#F4F4F0] px-5 py-20 sm:px-8 sm:py-28"
     >
       <div className="mb-14 max-w-3xl">
-        <motion.p
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="mb-4 flex items-center gap-2 font-mono text-[11px] font-bold tracking-[0.25em] text-zinc-500"
-          data-testid="lookbook-eyebrow"
-        >
-          <span className="inline-block h-2 w-2 bg-[#FFE600]" />
-          {t.lookbook.eyebrow}
-        </motion.p>
         <MaskedTitle
           testid="lookbook-title"
           className="font-display text-3xl leading-[0.95] font-extrabold tracking-tight uppercase sm:text-5xl"

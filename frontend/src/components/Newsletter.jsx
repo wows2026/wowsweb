@@ -32,15 +32,6 @@ export default function Newsletter() {
   return (
     <section data-testid="newsletter-section" className="border-y-2 border-black bg-[#FFE600] px-5 py-20 sm:px-8 sm:py-28">
       <div className="mx-auto max-w-5xl">
-        <motion.p
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="mb-6 font-mono text-[11px] font-bold tracking-[0.25em] text-black/60"
-        >
-          // NEWSLETTER
-        </motion.p>
         <MaskedTitle
           testid="newsletter-title"
           className="font-display text-[11vw] leading-[0.9] font-extrabold tracking-tight text-black uppercase sm:text-7xl lg:text-8xl"

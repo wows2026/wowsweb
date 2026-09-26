@@ -51,6 +51,11 @@ User choices: light minimalist design with a few yellow details; hero section wi
 - Main logo placed: navbar (black), footer (white), favicon (W mark on paper bg, favicon.png)
 - Marquee: white W mark (logo-mark-white.png) repeating rightward, yellow diamond separators REMOVED per user request
 
+## Iteration 2026-09-26 (user feedback round 3)
+- Hero: quote enlarged (text-6xl desktop), removed "DROP 001 — LIVE NOW" eyebrow, removed subtext, meta bar now shows only centered SCROLL indicator (PRG—LDN—TYO and 500 GSM removed)
+- Removed eyebrows: FEATURED // DROP 001 (products), CAMPAIGN 01 (lookbook), COMMUNITY (social), // NEWSLETTER (newsletter)
+- Hero video replaced with clothing showcase: mixkit 50639 (fashion studio photoshoot with garment rack), verified HTTP 200 video/mp4; poster = extracted video frame hosted locally at /public/hero-poster.jpg
+
 ## Backlog
 - P0: Real ambassador video content for social section (user to supply)
 - P1: Full e-commerce (product pages, cart, checkout) — products currently MOCKED (static data)
