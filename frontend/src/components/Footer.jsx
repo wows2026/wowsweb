@@ -17,7 +17,7 @@ export default function Footer() {
         <div>
           <div className="flex items-center gap-3">
             <Logo className="h-9 w-9 [&_path]:stroke-[#FAF9F6]" />
-            <span className="font-display text-2xl tracking-wide text-[#FAF9F6]">WINORWINS</span>
+            <span className="font-display text-2xl font-extrabold tracking-tight text-[#FAF9F6]">WINORWINS</span>
           </div>
           <p className="mt-5 max-w-sm font-mono text-[11px] leading-relaxed tracking-[0.15em] text-zinc-500">
             VICTORY IN EVERY FIBER. HEAVYWEIGHT ESSENTIALS, LIMITED RUNS, NO RESTOCKS.
@@ -60,7 +60,7 @@ export default function Footer() {
           whileInView={{ y: "0%", opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-          className="font-display text-[13.5vw] leading-[0.85] tracking-tight text-zinc-800 uppercase select-none"
+          className="font-display text-[13.5vw] leading-[0.85] font-extrabold tracking-tight text-zinc-800 uppercase select-none"
           data-testid="footer-wordmark"
         >
           WINORWINS<span className="text-[#FFE600]">.</span>

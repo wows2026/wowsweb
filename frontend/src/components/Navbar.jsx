@@ -47,7 +47,7 @@ export default function Navbar() {
           className="flex items-center gap-2.5"
         >
           <Logo className="h-7 w-7" />
-          <span className="font-display text-lg leading-none tracking-wide">WINORWINS</span>
+          <span className="font-display text-lg leading-none font-extrabold tracking-tight">WINORWINS</span>
         </a>
 
         <div className="hidden items-center gap-8 md:flex">

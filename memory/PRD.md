@@ -38,6 +38,13 @@ User choices: light minimalist design with a few yellow details; hero section wi
 - Frontend: screenshots at 375/768/1366, masked titles, CZ toggle, newsletter toast — verified
 - Hero video: URL serves HTTP 200 video/mp4 (curl); headless test browser aborts media loads, poster fallback confirmed visually. Real-browser playback not verifiable from this environment.
 
+## Iteration 2026-09-26 (user feedback round 1)
+- Marquee: replaced text items with the user's own brand logo (white-on-transparent PNG derived from uploaded webp, stored in /app/frontend/public/brand-logo-white.png), scrolling right with yellow diamond separators
+- Products: compact 4-across Represent-style cards (name, price, colorway, colour dots, hover flip + "+" button)
+- Social section renamed to "OUR SOCIALS" / "NAŠE SOCIÁLNÍ SÍTĚ", tiles are vertical video placeholders with play buttons ("VIDEO SOON") waiting for ambassador videos from user
+- Hero quote replaced with "THERE'S NO LOSING. ONLY LEARNING OR Winning" — smaller, left-aligned; "Winning" in Pinyon Script with animated hand-drawn yellow circle; quote stays English in both languages
+- Typography switched from Anton/Archivo to Helvetica Now Display (cdnfonts) + Pinyon Script accent
+
 ## Backlog
 - P0: Real ambassador video content for social section (user to supply)
 - P1: Full e-commerce (product pages, cart, checkout) — products currently MOCKED (static data)

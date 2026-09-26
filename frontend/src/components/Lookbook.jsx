@@ -30,7 +30,7 @@ export default function Lookbook() {
         </motion.p>
         <MaskedTitle
           testid="lookbook-title"
-          className="font-display text-4xl leading-[0.95] tracking-tight uppercase sm:text-6xl"
+          className="font-display text-3xl leading-[0.95] font-extrabold tracking-tight uppercase sm:text-5xl"
         >
           {t.lookbook.title}
         </MaskedTitle>

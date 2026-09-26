@@ -10,8 +10,9 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        display: ["Anton", "sans-serif"],
-        sans: ["Archivo", "sans-serif"],
+        display: ['"Helvetica Now Display"', '"Helvetica Neue"', 'Helvetica', 'Arial', 'sans-serif'],
+        sans: ['"Helvetica Now Display"', '"Helvetica Neue"', 'Helvetica', 'Arial', 'sans-serif'],
+        script: ['"Pinyon Script"', 'cursive'],
         mono: ["JetBrains Mono", "monospace"],
       },
       colors: {

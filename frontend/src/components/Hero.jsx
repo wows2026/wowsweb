@@ -9,7 +9,7 @@ const HERO_POSTER =
   "https://images.unsplash.com/photo-1615397587950-3cbb55f95b77?crop=entropy&cs=srgb&fm=jpg&q=85";
 
 const lineReveal = {
-  hidden: { y: "115%", rotate: 3 },
+  hidden: { y: "115%", rotate: 2 },
   visible: (i) => ({
     y: "0%",
     rotate: 0,
@@ -64,21 +64,60 @@ export default function Hero() {
 
         <h1
           data-testid="hero-headline"
-          className="font-display text-[12.5vw] leading-[0.85] tracking-tight text-[#0D0D0D] uppercase sm:text-[11vw] lg:text-[9vw]"
+          className="font-display text-[27px] leading-[1.1] font-extrabold tracking-tight text-[#0D0D0D] uppercase sm:text-4xl lg:text-[44px]"
         >
-          {t.hero.lines.map((line, i) => (
-            <span key={line} className="block overflow-hidden pb-1">
-              <motion.span
-                custom={i}
-                variants={lineReveal}
-                initial="hidden"
-                animate="visible"
-                className={`block origin-left ${i === 1 ? "w-fit bg-[#FFE600] px-3" : ""}`}
+          <span className="block overflow-hidden pb-1">
+            <motion.span custom={0} variants={lineReveal} initial="hidden" animate="visible" className="block origin-left">
+              {t.hero.line1}
+            </motion.span>
+          </span>
+          <motion.span
+            initial={{ opacity: 0, y: 22 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.62, duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+            className="mt-1 block"
+          >
+            {t.hero.line2}{" "}
+            <span className="relative inline-block px-4 align-baseline" data-testid="hero-script-word">
+              <span className="font-script text-[1.65em] leading-[0.8] normal-case tracking-normal">
+                {t.hero.scriptWord}
+              </span>
+              <motion.svg
+                className="pointer-events-none absolute -inset-x-2 -inset-y-3 h-[calc(100%+1.5rem)] w-[calc(100%+1rem)] overflow-visible"
+                viewBox="0 0 220 90"
+                fill="none"
+                preserveAspectRatio="none"
+                aria-hidden="true"
               >
-                {line}
-              </motion.span>
+                <motion.ellipse
+                  cx="110"
+                  cy="45"
+                  rx="102"
+                  ry="36"
+                  stroke="#FFE600"
+                  strokeWidth="5"
+                  strokeLinecap="round"
+                  transform="rotate(-2 110 45)"
+                  initial={{ pathLength: 0 }}
+                  animate={{ pathLength: 1 }}
+                  transition={{ delay: 1.5, duration: 0.8, ease: "easeInOut" }}
+                />
+                <motion.ellipse
+                  cx="110"
+                  cy="45"
+                  rx="96"
+                  ry="31"
+                  stroke="#FFE600"
+                  strokeWidth="2.5"
+                  opacity="0.7"
+                  transform="rotate(1.4 110 45)"
+                  initial={{ pathLength: 0 }}
+                  animate={{ pathLength: 1 }}
+                  transition={{ delay: 1.7, duration: 0.8, ease: "easeInOut" }}
+                />
+              </motion.svg>
             </span>
-          ))}
+          </motion.span>
         </h1>
 
         <div className="mt-8 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">

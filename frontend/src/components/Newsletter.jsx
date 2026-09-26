@@ -43,7 +43,7 @@ export default function Newsletter() {
         </motion.p>
         <MaskedTitle
           testid="newsletter-title"
-          className="font-display text-[11vw] leading-[0.9] tracking-tight text-black uppercase sm:text-7xl lg:text-8xl"
+          className="font-display text-[11vw] leading-[0.9] font-extrabold tracking-tight text-black uppercase sm:text-7xl lg:text-8xl"
         >
           {t.newsletter.title}
         </MaskedTitle>

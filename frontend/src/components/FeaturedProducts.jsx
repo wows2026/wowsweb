@@ -1,15 +1,15 @@
 import { motion } from "framer-motion";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { useLanguage } from "@/i18n";
 import MaskedTitle from "@/components/MaskedTitle";
 
 const cardReveal = {
-  hidden: { opacity: 0, y: 48 },
+  hidden: { opacity: 0, y: 40 },
   visible: (i) => ({
     opacity: 1,
     y: 0,
-    transition: { delay: i * 0.09, duration: 0.8, ease: [0.16, 1, 0.3, 1] },
+    transition: { delay: i * 0.07, duration: 0.7, ease: [0.16, 1, 0.3, 1] },
   }),
 };
 
@@ -33,7 +33,7 @@ export default function FeaturedProducts() {
           </motion.p>
           <MaskedTitle
             testid="products-title"
-            className="font-display text-4xl leading-none tracking-tight uppercase sm:text-6xl"
+            className="font-display text-3xl leading-none font-extrabold tracking-tight uppercase sm:text-5xl"
           >
             {t.products.title}
           </MaskedTitle>
@@ -52,7 +52,7 @@ export default function FeaturedProducts() {
         </motion.button>
       </div>
 
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+      <div className="grid grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-4">
         {t.products.items.map((p, i) => (
           <motion.a
             key={p.id}
@@ -64,40 +64,45 @@ export default function FeaturedProducts() {
             whileInView="visible"
             viewport={{ once: true, margin: "-60px" }}
             data-testid={`product-card-${p.id}`}
-            className="group block border border-zinc-200 bg-white transition-colors duration-300 hover:border-black"
+            className="group block"
           >
-            <div className="relative aspect-[4/5] overflow-hidden bg-[#F4F4F0]">
+            <div className="relative aspect-[3/4] overflow-hidden bg-[#F4F4F0]">
               <img
                 src={p.images.main}
                 alt={p.name}
                 loading="lazy"
-                className="absolute inset-0 h-full w-full object-cover transition-opacity duration-700 group-hover:opacity-0"
+                className="absolute inset-0 h-full w-full object-cover transition-opacity duration-500 group-hover:opacity-0"
               />
               <img
                 src={p.images.hover}
                 alt={`${p.name} alternate`}
                 loading="lazy"
-                className="absolute inset-0 h-full w-full scale-105 object-cover opacity-0 transition-[opacity,transform] duration-700 group-hover:scale-100 group-hover:opacity-100"
+                className="absolute inset-0 h-full w-full scale-[1.03] object-cover opacity-0 transition-[opacity,transform] duration-500 group-hover:scale-100 group-hover:opacity-100"
               />
-              <span className="absolute top-3 left-3 bg-[#FFE600] px-2.5 py-1 font-mono text-[10px] font-bold tracking-[0.15em] text-black">
+              <span className="absolute top-2.5 left-2.5 bg-[#FFE600] px-2 py-0.5 font-mono text-[9px] font-bold tracking-[0.15em] text-black">
                 {p.badge}
               </span>
-              <span className="absolute top-3 right-3 bg-black/80 px-2.5 py-1 font-mono text-[10px] tracking-[0.15em] text-zinc-200 backdrop-blur-sm">
-                {p.gsm}
+              <span className="absolute right-2.5 bottom-2.5 flex h-8 w-8 translate-y-1 items-center justify-center rounded-full bg-white text-black opacity-0 shadow-sm transition-[opacity,transform] duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+                <Plus className="h-4 w-4" />
               </span>
             </div>
-            <div className="flex items-start justify-between gap-4 border-t border-zinc-200 p-4 sm:p-5">
-              <div>
-                <p className="mb-1 font-mono text-[10px] tracking-[0.2em] text-zinc-400">{p.tag}</p>
-                <h3 className="text-base font-extrabold tracking-tight uppercase sm:text-lg">{p.name}</h3>
-                <p className="mt-1 text-xs text-zinc-500">{p.colorway}</p>
+            <div className="pt-3">
+              <div className="flex items-baseline justify-between gap-2">
+                <h3 className="text-[13px] font-bold tracking-tight uppercase">{p.name}</h3>
+                <p className="text-[13px] font-semibold whitespace-nowrap">{p.price}</p>
               </div>
-              <div className="text-right">
-                <p className="text-base font-extrabold sm:text-lg">{p.price}</p>
-                <p className="mt-4 flex items-center justify-end gap-1 font-mono text-[10px] tracking-[0.2em] text-zinc-400 transition-colors group-hover:text-black">
-                  SHOP
-                  <ArrowUpRight className="h-3 w-3 transition-transform duration-300 group-hover:rotate-45" />
-                </p>
+              <p className="mt-0.5 text-xs text-zinc-500">{p.colorway}</p>
+              <div className="mt-1.5 flex items-center gap-1.5">
+                {p.colors.map((c) => (
+                  <span
+                    key={c}
+                    className="h-3 w-3 rounded-full border border-zinc-300"
+                    style={{ backgroundColor: c }}
+                  />
+                ))}
+                <span className="ml-1 text-[10px] text-zinc-400">
+                  {p.colors.length} {p.colors.length > 1 ? t.products.colours : t.products.colour}
+                </span>
               </div>
             </div>
           </motion.a>
