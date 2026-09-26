@@ -51,6 +51,15 @@ User choices: light minimalist design with a few yellow details; hero section wi
 - Main logo placed: navbar (black), footer (white), favicon (W mark on paper bg, favicon.png)
 - Marquee: white W mark (logo-mark-white.png) repeating rightward, yellow diamond separators REMOVED per user request
 
+## Shopify Integration (2026-09-26)
+Architecture: Emergent React frontend → FastAPI backend proxy → Shopify Storefront API (products/cart/checkout) + Shopify Admin API (newsletter customers). Teya = payment provider inside Shopify Checkout (no code on our side).
+- Credentials in /app/backend/.env ONLY: SHOPIFY_SHOP=c007fn-qn, SHOPIFY_CLIENT_ID, SHOPIFY_CLIENT_SECRET (Admin via Client Credentials Grant, token cached + auto-refresh in shopify_client.py), SHOPIFY_STOREFRONT_TOKEN, SHOPIFY_API_VERSION=2026-01
+- Backend endpoints: GET /api/products, GET/POST /api/cart, POST /api/cart/lines, PATCH /api/cart/lines, POST /api/cart/lines/remove, POST /api/cart/discount, POST /api/newsletter (creates Shopify customer with SINGLE_OPT_IN marketing consent; duplicate → 409)
+- Storefront API quirks: Cart has NO completedAt field in 2026-01 (completed cart returns null → frontend clears stored cart on 404); cartDiscountCodesUpdate variable must be [String!]!
+- Frontend: /src/shop.js CartProvider (cart id in localStorage), CartDrawer.jsx (slide-over in existing design), Navbar cart icon + badge, FeaturedProducts fetches live Shopify products (same card design, "+" quick-add, variant picker overlay, SOLD OUT badge, compare-at strikethrough, skeleton/error/empty states)
+- Prices/inventory always validated server-side via Shopify — frontend never trusts its own data
+- Verified: products list (2 test products), cart create/update/remove, discount code applicability, checkoutUrl, newsletter subscribe + 409 duplicate, E2E screenshots desktop+mobile
+
 ## Iteration 2026-09-26 (user feedback round 3)
 - Hero: quote enlarged (text-6xl desktop), removed "DROP 001 — LIVE NOW" eyebrow, removed subtext, meta bar now shows only centered SCROLL indicator (PRG—LDN—TYO and 500 GSM removed)
 - Removed eyebrows: FEATURED // DROP 001 (products), CAMPAIGN 01 (lookbook), COMMUNITY (social), // NEWSLETTER (newsletter)

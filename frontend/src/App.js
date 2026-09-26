@@ -3,6 +3,7 @@ import Lenis from "lenis";
 import { Toaster } from "sonner";
 import "@/App.css";
 import { LanguageProvider } from "@/i18n";
+import { CartProvider } from "@/shop";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import Marquee from "@/components/Marquee";
@@ -11,6 +12,7 @@ import Lookbook from "@/components/Lookbook";
 import Social from "@/components/Social";
 import Newsletter from "@/components/Newsletter";
 import Footer from "@/components/Footer";
+import CartDrawer from "@/components/CartDrawer";
 
 export default function App() {
   useEffect(() => {
@@ -31,33 +33,36 @@ export default function App() {
 
   return (
     <LanguageProvider>
-      <div className="min-h-screen bg-[#FAF9F6] font-sans text-[#0D0D0D] antialiased">
-        <div className="grain" aria-hidden="true" />
-        <Navbar />
-        <main>
-          <Hero />
-          <Marquee />
-          <FeaturedProducts />
-          <Lookbook />
-          <Social />
-          <Newsletter />
-        </main>
-        <Footer />
-        <Toaster
-          position="bottom-center"
-          toastOptions={{
-            style: {
-              background: "#0D0D0D",
-              color: "#FAF9F6",
-              border: "1px solid #FFE600",
-              borderRadius: 0,
-              fontFamily: '"Helvetica Now Display", "Helvetica Neue", Helvetica, Arial, sans-serif',
-              fontSize: "12px",
-              letterSpacing: "0.05em",
-            },
-          }}
-        />
-      </div>
+      <CartProvider>
+        <div className="min-h-screen bg-[#FAF9F6] font-sans text-[#0D0D0D] antialiased">
+          <div className="grain" aria-hidden="true" />
+          <Navbar />
+          <main>
+            <Hero />
+            <Marquee />
+            <FeaturedProducts />
+            <Lookbook />
+            <Social />
+            <Newsletter />
+          </main>
+          <Footer />
+          <CartDrawer />
+          <Toaster
+            position="bottom-center"
+            toastOptions={{
+              style: {
+                background: "#0D0D0D",
+                color: "#FAF9F6",
+                border: "1px solid #FFE600",
+                borderRadius: 0,
+                fontFamily: '"Helvetica Now Display", "Helvetica Neue", Helvetica, Arial, sans-serif',
+                fontSize: "12px",
+                letterSpacing: "0.05em",
+              },
+            }}
+          />
+        </div>
+      </CartProvider>
     </LanguageProvider>
   );
 }

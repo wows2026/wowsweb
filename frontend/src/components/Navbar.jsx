@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
+import { ShoppingBag } from "lucide-react";
 import { useLanguage } from "@/i18n";
+import { useCart } from "@/shop";
 
 export function scrollToSection(id) {
   const el = document.querySelector(id);
@@ -10,6 +12,7 @@ export function scrollToSection(id) {
 
 export default function Navbar() {
   const { t, lang, setLang } = useLanguage();
+  const { cart, setOpen } = useCart();
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -25,6 +28,8 @@ export default function Navbar() {
     { id: "#community", label: t.nav.community, testid: "nav-link-community" },
     { id: "#contact", label: t.nav.contact, testid: "nav-link-contact" },
   ];
+
+  const count = cart?.totalQuantity || 0;
 
   return (
     <header
@@ -43,7 +48,7 @@ export default function Navbar() {
             if (window.__lenis) window.__lenis.scrollTo(0);
             else window.scrollTo({ top: 0, behavior: "smooth" });
           }}
-          className="flex items-center gap-2.5"
+          className="flex items-center"
         >
           <img src="/logo-main-black.png" alt="WINORWINS" className="h-9 w-auto sm:h-10" />
         </a>
@@ -66,21 +71,39 @@ export default function Navbar() {
           ))}
         </div>
 
-        <div className="flex items-center gap-1 font-mono text-[11px] font-bold tracking-widest" data-testid="language-toggle">
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 font-mono text-[11px] font-bold tracking-widest" data-testid="language-toggle">
+            <button
+              data-testid="lang-en-button"
+              onClick={() => setLang("en")}
+              className={`px-2 py-1 transition-colors ${lang === "en" ? "bg-[#0D0D0D] text-[#FFE600]" : "text-zinc-500 hover:text-black"}`}
+            >
+              EN
+            </button>
+            <span className="text-zinc-300">/</span>
+            <button
+              data-testid="lang-cz-button"
+              onClick={() => setLang("cz")}
+              className={`px-2 py-1 transition-colors ${lang === "cz" ? "bg-[#0D0D0D] text-[#FFE600]" : "text-zinc-500 hover:text-black"}`}
+            >
+              CZ
+            </button>
+          </div>
           <button
-            data-testid="lang-en-button"
-            onClick={() => setLang("en")}
-            className={`px-2 py-1 transition-colors ${lang === "en" ? "bg-[#0D0D0D] text-[#FFE600]" : "text-zinc-500 hover:text-black"}`}
+            data-testid="nav-cart-button"
+            onClick={() => setOpen(true)}
+            aria-label="Open cart"
+            className="relative p-2 transition-colors hover:text-zinc-600"
           >
-            EN
-          </button>
-          <span className="text-zinc-300">/</span>
-          <button
-            data-testid="lang-cz-button"
-            onClick={() => setLang("cz")}
-            className={`px-2 py-1 transition-colors ${lang === "cz" ? "bg-[#0D0D0D] text-[#FFE600]" : "text-zinc-500 hover:text-black"}`}
-          >
-            CZ
+            <ShoppingBag className="h-5 w-5" />
+            {count > 0 && (
+              <span
+                data-testid="cart-count-badge"
+                className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#FFE600] px-0.5 font-mono text-[9px] font-bold text-black"
+              >
+                {count}
+              </span>
+            )}
           </button>
         </div>
       </nav>
