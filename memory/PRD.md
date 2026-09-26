@@ -67,6 +67,10 @@ Architecture: Emergent React frontend → FastAPI backend proxy → Shopify Stor
 - Marquee: YELLOW background with black logo marks (was black bg)
 - Footer: YELLOW background, black text/wordmark, yellow dot removed (was dark)
 
+## Iteration 2026-09-26 (user feedback round 5)
+- Footer reverted to BLACK background; only the giant WINORWINS wordmark is yellow
+- Product page: left info block and right buy box (price + ADD TO CART) are now vertically centered against the product image; grid rows min-height = viewport minus nav
+
 ## Iteration 2026-09-26 (user feedback round 3)
 - Hero: quote enlarged (text-6xl desktop), removed "DROP 001 — LIVE NOW" eyebrow, removed subtext, meta bar now shows only centered SCROLL indicator (PRG—LDN—TYO and 500 GSM removed)
 - Removed eyebrows: FEATURED // DROP 001 (products), CAMPAIGN 01 (lookbook), COMMUNITY (social), // NEWSLETTER (newsletter)

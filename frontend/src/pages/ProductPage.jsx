@@ -114,37 +114,39 @@ export default function ProductPage() {
 
   return (
     <div className="min-h-screen pt-16" data-testid="product-page">
-      <div className="grid lg:grid-cols-[1fr_1.4fr_1fr]">
+      <div className="grid lg:min-h-[calc(100svh-4rem)] lg:grid-cols-[1fr_1.4fr_1fr]">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-          className="order-2 px-5 py-10 sm:px-8 lg:order-1 lg:py-14"
+          className="order-2 flex flex-col px-5 py-10 sm:px-8 lg:order-1 lg:py-14"
         >
           <Link
             to="/collection"
             data-testid="product-back-link"
-            className="inline-flex items-center gap-2 font-mono text-[11px] font-bold tracking-[0.2em] text-zinc-500 transition-colors hover:text-black"
+            className="inline-flex w-fit items-center gap-2 font-mono text-[11px] font-bold tracking-[0.2em] text-zinc-500 transition-colors hover:text-black"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
             {t.product.back}
           </Link>
-          <h1
-            data-testid="product-title"
-            className="mt-8 font-display text-3xl leading-[1.02] font-extrabold tracking-tight uppercase sm:text-4xl"
-          >
-            {product.name}
-          </h1>
-          {product.badge && (
-            <span className="mt-4 inline-block bg-[#FFE600] px-2.5 py-1 font-mono text-[10px] font-bold tracking-[0.15em]">
-              {product.badge}
-            </span>
-          )}
-          {product.description && (
-            <p data-testid="product-description" className="mt-8 text-sm leading-relaxed whitespace-pre-line text-zinc-600">
-              {product.description}
-            </p>
-          )}
+          <div className="flex flex-1 flex-col justify-center py-8">
+            <h1
+              data-testid="product-title"
+              className="font-display text-3xl leading-[1.02] font-extrabold tracking-tight uppercase sm:text-4xl"
+            >
+              {product.name}
+            </h1>
+            {product.badge && (
+              <span className="mt-4 inline-block w-fit bg-[#FFE600] px-2.5 py-1 font-mono text-[10px] font-bold tracking-[0.15em]">
+                {product.badge}
+              </span>
+            )}
+            {product.description && (
+              <p data-testid="product-description" className="mt-8 text-sm leading-relaxed whitespace-pre-line text-zinc-600">
+                {product.description}
+              </p>
+            )}
+          </div>
         </motion.div>
 
         <motion.div
@@ -189,7 +191,7 @@ export default function ProductPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-          className="order-3 px-5 py-10 sm:px-8 lg:py-14"
+          className="order-3 flex flex-col justify-center px-5 py-10 sm:px-8 lg:py-14"
         >
           <p className="text-2xl font-extrabold tracking-tight" data-testid="product-price">
             {compareAt && <span className="mr-2 text-lg font-normal text-zinc-400 line-through">{formatPrice(compareAt, lang)}</span>}
