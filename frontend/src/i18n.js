@@ -75,6 +75,7 @@ export const translations = {
     },
     locked: {
       tagline: "DROP 001 — COMING SOON",
+      waitlist: "JOIN THE WAITLIST",
       emailPlaceholder: "Email address",
       notify: "SIGN UP",
       subscribed: "YOU'RE IN. VICTORY INCOMING.",
@@ -170,6 +171,7 @@ export const translations = {
     },
     locked: {
       tagline: "DROP 001 — JIŽ BRZY",
+      waitlist: "PŘIDEJ SE NA WAITLIST",
       emailPlaceholder: "E-mailová adresa",
       notify: "SIGN UP",
       subscribed: "JSI UVNITŘ. VÍTĚZSTVÍ SE BLÍŽÍ.",

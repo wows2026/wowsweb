@@ -71,6 +71,16 @@ export default function LockScreen({ onUnlock }) {
         {t.locked.tagline}
       </motion.p>
 
+      <motion.p
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+        className="mt-8 font-display text-2xl font-extrabold tracking-tight text-black uppercase sm:text-3xl"
+        data-testid="lock-waitlist"
+      >
+        {t.locked.waitlist}
+      </motion.p>
+
       {emailDone ? (
         <motion.p
           initial={{ opacity: 0, y: 10 }}
