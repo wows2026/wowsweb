@@ -75,6 +75,7 @@ Architecture: Emergent React frontend → FastAPI backend proxy → Shopify Stor
 - Full-screen lock overlay: yellow bg, black main logo centered, "DROP 001 — COMING SOON", email capture (reuses /api/newsletter → Shopify customer), "ENTER PASSWORD" bottom-right expands password field
 - Backend: POST /api/auth/unlock validates against SITE_PASSWORD env (current: WINNER2026, see /app/memory/test_credentials.md); wrong → 401
 - Unlock persists via localStorage wino_unlocked; lock slides up on success; Lenis scroll stopped while locked
+- Lock page additions: pill email form (black border/placeholder/button), "JOIN THE WAITLIST" headline, live countdown timer (DROP_DATE constant in LockScreen.jsx, currently 2026-10-31 19:00 CET)
 
 ## Iteration 2026-09-26 (user feedback round 3)
 - Hero: quote enlarged (text-6xl desktop), removed "DROP 001 — LIVE NOW" eyebrow, removed subtext, meta bar now shows only centered SCROLL indicator (PRG—LDN—TYO and 500 GSM removed)

@@ -1,12 +1,30 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { KeyRound } from "lucide-react";
 import axios from "axios";
 import { useLanguage } from "@/i18n";
 import { API } from "@/shop";
 
+const DROP_DATE = new Date("2026-10-31T19:00:00+01:00").getTime();
+
+function useCountdown() {
+  const [now, setNow] = useState(Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, []);
+  const diff = Math.max(0, DROP_DATE - now);
+  return [
+    Math.floor(diff / 86400000),
+    Math.floor((diff / 3600000) % 24),
+    Math.floor((diff / 60000) % 60),
+    Math.floor((diff / 1000) % 60),
+  ];
+}
+
 export default function LockScreen({ onUnlock }) {
   const { t } = useLanguage();
+  const [d, h, m, s] = useCountdown();
   const [email, setEmail] = useState("");
   const [emailDone, setEmailDone] = useState(false);
   const [emailLoading, setEmailLoading] = useState(false);
@@ -80,6 +98,28 @@ export default function LockScreen({ onUnlock }) {
       >
         {t.locked.waitlist}
       </motion.p>
+
+      <motion.div
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.65, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+        className="mt-8 flex items-start gap-6 sm:gap-10"
+        data-testid="lock-countdown"
+      >
+        {[
+          [d, t.locked.days],
+          [h, t.locked.hours],
+          [m, t.locked.minutes],
+          [s, t.locked.seconds],
+        ].map(([value, label]) => (
+          <div key={label} className="flex flex-col items-center">
+            <span className="font-display text-3xl font-extrabold tracking-tight text-black tabular-nums sm:text-4xl">
+              {String(value).padStart(2, "0")}
+            </span>
+            <span className="mt-1 font-mono text-[9px] font-bold tracking-[0.3em] text-black/50">{label}</span>
+          </div>
+        ))}
+      </motion.div>
 
       {emailDone ? (
         <motion.p

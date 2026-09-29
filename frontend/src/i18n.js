@@ -76,6 +76,10 @@ export const translations = {
     locked: {
       tagline: "DROP 001 — COMING SOON",
       waitlist: "JOIN THE WAITLIST",
+      days: "DAYS",
+      hours: "HRS",
+      minutes: "MIN",
+      seconds: "SEC",
       emailPlaceholder: "Email address",
       notify: "SIGN UP",
       subscribed: "YOU'RE IN. VICTORY INCOMING.",
@@ -172,6 +176,10 @@ export const translations = {
     locked: {
       tagline: "DROP 001 — JIŽ BRZY",
       waitlist: "PŘIDEJ SE NA WAITLIST",
+      days: "DNÍ",
+      hours: "HOD",
+      minutes: "MIN",
+      seconds: "SEK",
       emailPlaceholder: "E-mailová adresa",
       notify: "SIGN UP",
       subscribed: "JSI UVNITŘ. VÍTĚZSTVÍ SE BLÍŽÍ.",
