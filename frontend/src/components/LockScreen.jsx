@@ -96,14 +96,14 @@ export default function LockScreen({ onUnlock }) {
             onChange={(e) => setEmail(e.target.value)}
             placeholder={t.locked.emailPlaceholder}
             data-testid="lock-email-input"
-            className="h-14 min-w-0 flex-1 rounded-full border border-white/70 bg-transparent px-6 text-center text-sm font-medium text-black outline-none placeholder-white/80"
+            className="h-14 min-w-0 flex-1 rounded-full border border-black bg-transparent px-6 text-center text-sm font-medium text-black outline-none placeholder-black"
           />
           <motion.button
             type="submit"
             whileTap={{ scale: 0.96 }}
             disabled={emailLoading}
             data-testid="lock-email-submit"
-            className="h-14 shrink-0 rounded-full bg-white px-5 text-[13px] font-bold tracking-[0.2em] whitespace-nowrap text-black transition-opacity disabled:opacity-60 sm:px-8 sm:text-sm sm:tracking-[0.25em]"
+            className="h-14 shrink-0 rounded-full bg-black px-5 text-[13px] font-bold tracking-[0.2em] whitespace-nowrap text-[#FFE600] transition-opacity disabled:opacity-60 sm:px-8 sm:text-sm sm:tracking-[0.25em]"
           >
             {emailLoading ? "..." : t.locked.notify}
           </motion.button>
