@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, KeyRound } from "lucide-react";
+import { KeyRound } from "lucide-react";
 import axios from "axios";
 import { useLanguage } from "@/i18n";
 import { API } from "@/shop";
@@ -96,17 +96,16 @@ export default function LockScreen({ onUnlock }) {
             onChange={(e) => setEmail(e.target.value)}
             placeholder={t.locked.emailPlaceholder}
             data-testid="lock-email-input"
-            className="h-12 flex-1 border-b-2 border-black bg-transparent text-center font-mono text-sm text-black outline-none placeholder-black/40"
+            className="h-14 min-w-0 flex-1 rounded-full border border-white/70 bg-transparent px-6 text-center text-sm font-medium text-black outline-none placeholder-white/80"
           />
           <motion.button
             type="submit"
             whileTap={{ scale: 0.96 }}
             disabled={emailLoading}
             data-testid="lock-email-submit"
-            className="flex h-12 items-center gap-2 bg-black px-5 font-mono text-[10px] font-bold tracking-[0.2em] text-[#FFE600] disabled:opacity-60"
+            className="h-14 shrink-0 rounded-full bg-white px-5 text-[13px] font-bold tracking-[0.2em] whitespace-nowrap text-black transition-opacity disabled:opacity-60 sm:px-8 sm:text-sm sm:tracking-[0.25em]"
           >
             {emailLoading ? "..." : t.locked.notify}
-            <ArrowRight className="h-3.5 w-3.5" />
           </motion.button>
         </motion.form>
       )}

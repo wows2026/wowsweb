@@ -75,8 +75,8 @@ export const translations = {
     },
     locked: {
       tagline: "DROP 001 — COMING SOON",
-      emailPlaceholder: "your@email.com",
-      notify: "NOTIFY ME",
+      emailPlaceholder: "Email address",
+      notify: "SIGN UP",
       subscribed: "YOU'RE IN. VICTORY INCOMING.",
       enterPassword: "ENTER PASSWORD",
       passwordPlaceholder: "PASSWORD",
@@ -170,8 +170,8 @@ export const translations = {
     },
     locked: {
       tagline: "DROP 001 — JIŽ BRZY",
-      emailPlaceholder: "tvuj@email.cz",
-      notify: "DEJ MI VĚDĚT",
+      emailPlaceholder: "E-mailová adresa",
+      notify: "SIGN UP",
       subscribed: "JSI UVNITŘ. VÍTĚZSTVÍ SE BLÍŽÍ.",
       enterPassword: "ZADEJ HESLO",
       passwordPlaceholder: "HESLO",
