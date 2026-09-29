@@ -418,6 +418,17 @@ async def subscribe_newsletter(input: NewsletterSubscribe):
     return {"status": "subscribed", "email": input.email}
 
 
+class UnlockInput(BaseModel):
+    password: str
+
+
+@api_router.post("/auth/unlock")
+async def unlock_site(input: UnlockInput):
+    if input.password != os.environ.get("SITE_PASSWORD"):
+        raise HTTPException(status_code=401, detail="wrong_password")
+    return {"status": "unlocked"}
+
+
 app.include_router(api_router)
 
 app.add_middleware(

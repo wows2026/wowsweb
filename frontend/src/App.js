@@ -1,7 +1,8 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Lenis from "lenis";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { Toaster } from "sonner";
+import { AnimatePresence } from "framer-motion";
 import "@/App.css";
 import { LanguageProvider } from "@/i18n";
 import { CartProvider } from "@/shop";
@@ -14,6 +15,7 @@ import Social from "@/components/Social";
 import Newsletter from "@/components/Newsletter";
 import Footer from "@/components/Footer";
 import CartDrawer from "@/components/CartDrawer";
+import LockScreen from "@/components/LockScreen";
 import CollectionPage from "@/pages/CollectionPage";
 import ProductPage from "@/pages/ProductPage";
 import LookbookPage from "@/pages/LookbookPage";
@@ -43,6 +45,8 @@ function ScrollToTop() {
 }
 
 export default function App() {
+  const [unlocked, setUnlocked] = useState(() => localStorage.getItem("wino_unlocked") === "1");
+
   useEffect(() => {
     const lenis = new Lenis({ duration: 1.15, smoothWheel: true });
     window.__lenis = lenis;
@@ -59,6 +63,12 @@ export default function App() {
     };
   }, []);
 
+  useEffect(() => {
+    if (!window.__lenis) return;
+    if (unlocked) window.__lenis.start();
+    else window.__lenis.stop();
+  }, [unlocked]);
+
   return (
     <LanguageProvider>
       <CartProvider>
@@ -66,6 +76,9 @@ export default function App() {
           <ScrollToTop />
           <div className="min-h-screen bg-[#FAF9F6] font-sans text-[#0D0D0D] antialiased">
             <div className="grain" aria-hidden="true" />
+            <AnimatePresence>
+              {!unlocked && <LockScreen onUnlock={() => setUnlocked(true)} />}
+            </AnimatePresence>
             <Navbar />
             <Routes>
               <Route path="/" element={<Landing />} />

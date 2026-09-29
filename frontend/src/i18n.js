@@ -73,6 +73,16 @@ export const translations = {
       shippingNote: "Shipping & taxes calculated at checkout.",
       secure: "SECURE CHECKOUT — SHOPIFY · TEYA",
     },
+    locked: {
+      tagline: "DROP 001 — COMING SOON",
+      emailPlaceholder: "your@email.com",
+      notify: "NOTIFY ME",
+      subscribed: "YOU'RE IN. VICTORY INCOMING.",
+      enterPassword: "ENTER PASSWORD",
+      passwordPlaceholder: "PASSWORD",
+      unlock: "ENTER",
+      wrong: "WRONG PASSWORD",
+    },
     newsletter: {
       title: "JOIN THE WINNERS CLUB",
       sub: "First access to DROP 002, private sales and members-only colorways.",
@@ -157,6 +167,16 @@ export const translations = {
       discountInvalid: "Neplatný slevový kód",
       shippingNote: "Doprava a daně se spočítají u pokladny.",
       secure: "ZABEZPEČENÁ PLATBA — SHOPIFY · TEYA",
+    },
+    locked: {
+      tagline: "DROP 001 — JIŽ BRZY",
+      emailPlaceholder: "tvuj@email.cz",
+      notify: "DEJ MI VĚDĚT",
+      subscribed: "JSI UVNITŘ. VÍTĚZSTVÍ SE BLÍŽÍ.",
+      enterPassword: "ZADEJ HESLO",
+      passwordPlaceholder: "HESLO",
+      unlock: "VSTOUPIT",
+      wrong: "ŠPATNÉ HESLO",
     },
     newsletter: {
       title: "PŘIPOJ SE DO WINNERS CLUBU",

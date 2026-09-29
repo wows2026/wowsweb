@@ -71,6 +71,11 @@ Architecture: Emergent React frontend → FastAPI backend proxy → Shopify Stor
 - Footer reverted to BLACK background; only the giant WINORWINS wordmark is yellow
 - Product page: left info block and right buy box (price + ADD TO CART) are now vertically centered against the product image; grid rows min-height = viewport minus nav
 
+## Lock / gate page (2026-09-29, user feedback round 6)
+- Full-screen lock overlay: yellow bg, black main logo centered, "DROP 001 — COMING SOON", email capture (reuses /api/newsletter → Shopify customer), "ENTER PASSWORD" bottom-right expands password field
+- Backend: POST /api/auth/unlock validates against SITE_PASSWORD env (current: WINNER2026, see /app/memory/test_credentials.md); wrong → 401
+- Unlock persists via localStorage wino_unlocked; lock slides up on success; Lenis scroll stopped while locked
+
 ## Iteration 2026-09-26 (user feedback round 3)
 - Hero: quote enlarged (text-6xl desktop), removed "DROP 001 — LIVE NOW" eyebrow, removed subtext, meta bar now shows only centered SCROLL indicator (PRG—LDN—TYO and 500 GSM removed)
 - Removed eyebrows: FEATURED // DROP 001 (products), CAMPAIGN 01 (lookbook), COMMUNITY (social), // NEWSLETTER (newsletter)
