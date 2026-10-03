@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowUpRight, Instagram, Music2, ArrowRight } from "lucide-react";
+import { ArrowUpRight, Instagram, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import axios from "axios";
 import { useLanguage } from "@/i18n";
 import { API } from "@/shop";
 import MaskedTitle from "@/components/MaskedTitle";
+import TikTokIcon from "@/components/TikTokIcon";
 
 export default function ContactPage() {
   const { t } = useLanguage();
@@ -14,7 +15,7 @@ export default function ContactPage() {
 
   const socials = [
     { name: "Instagram", link: "https://instagram.com/winorwins.co", Icon: Instagram, testid: "contact-instagram" },
-    { name: "TikTok", link: "https://tiktok.com/@winorwins.co", Icon: Music2, testid: "contact-tiktok" },
+    { name: "TikTok", link: "https://tiktok.com/@winorwins.co", Icon: TikTokIcon, testid: "contact-tiktok" },
   ];
 
   const set = (key) => (e) => setForm((f) => ({ ...f, [key]: e.target.value }));

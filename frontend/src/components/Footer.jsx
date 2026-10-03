@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
-import { Instagram, Music2 } from "lucide-react";
+import { Instagram } from "lucide-react";
 import { useLanguage } from "@/i18n";
+import TikTokIcon from "@/components/TikTokIcon";
 
 export default function Footer() {
   const { t } = useLanguage();
@@ -12,7 +13,7 @@ export default function Footer() {
 
   const socials = [
     { name: "Instagram", link: "https://instagram.com/winorwins.co", Icon: Instagram, testid: "footer-social-instagram" },
-    { name: "TikTok", link: "https://tiktok.com/@winorwins.co", Icon: Music2, testid: "footer-social-tiktok" },
+    { name: "TikTok", link: "https://tiktok.com/@winorwins.co", Icon: TikTokIcon, testid: "footer-social-tiktok" },
   ];
 
   return (
@@ -54,7 +55,7 @@ export default function Footer() {
           ))}
           <div>
             <p className="mb-4 font-mono text-[10px] font-bold tracking-[0.25em] text-zinc-500">{t.footer.headings.socials}</p>
-            <div className="flex gap-3">
+            <div className="flex items-center gap-5">
               {socials.map(({ name, link, Icon, testid }) => (
                 <a
                   key={name}
@@ -63,7 +64,7 @@ export default function Footer() {
                   rel="noopener noreferrer"
                   data-testid={testid}
                   aria-label={name}
-                  className="flex h-10 w-10 items-center justify-center border border-zinc-700 text-zinc-400 transition-colors hover:border-[#FFE600] hover:bg-[#FFE600] hover:text-black"
+                  className="text-zinc-400 transition-colors hover:text-[#FFE600]"
                 >
                   <Icon className="h-5 w-5" />
                 </a>

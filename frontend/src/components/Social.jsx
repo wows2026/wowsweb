@@ -1,9 +1,10 @@
 import { motion } from "framer-motion";
-import { Instagram, Facebook, Music2, ArrowUpRight, Play } from "lucide-react";
+import { Instagram, ArrowUpRight, Play } from "lucide-react";
 import { useLanguage } from "@/i18n";
 import MaskedTitle from "@/components/MaskedTitle";
+import TikTokIcon from "@/components/TikTokIcon";
 
-const ICONS = { INSTAGRAM: Instagram, TIKTOK: Music2, FACEBOOK: Facebook };
+const ICONS = { INSTAGRAM: Instagram, TIKTOK: TikTokIcon };
 
 export default function Social() {
   const { t } = useLanguage();
