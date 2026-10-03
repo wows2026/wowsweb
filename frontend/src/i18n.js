@@ -56,9 +56,8 @@ export const translations = {
       sub: "Video reels from our ambassadors are coming soon. Tag #WINORWINS to get featured.",
       comingSoon: "VIDEO SOON",
       channels: [
-        { platform: "INSTAGRAM", handle: "@winorwins.clo", link: "https://instagram.com" },
-        { platform: "TIKTOK", handle: "@winorwins", link: "https://tiktok.com" },
-        { platform: "FACEBOOK", handle: "WINORWINS Official", link: "https://facebook.com" },
+        { platform: "INSTAGRAM", handle: "@winorwins.co", link: "https://instagram.com/winorwins.co" },
+        { platform: "TIKTOK", handle: "@winorwins.co", link: "https://tiktok.com/@winorwins.co" },
       ],
     },
     cart: {
@@ -161,9 +160,8 @@ export const translations = {
       sub: "Videa od našich ambasadorů vychází brzy. Označ #WINORWINS a buď featured.",
       comingSoon: "VIDEO BRZY",
       channels: [
-        { platform: "INSTAGRAM", handle: "@winorwins.clo", link: "https://instagram.com" },
-        { platform: "TIKTOK", handle: "@winorwins", link: "https://tiktok.com" },
-        { platform: "FACEBOOK", handle: "WINORWINS Official", link: "https://facebook.com" },
+        { platform: "INSTAGRAM", handle: "@winorwins.co", link: "https://instagram.com/winorwins.co" },
+        { platform: "TIKTOK", handle: "@winorwins.co", link: "https://tiktok.com/@winorwins.co" },
       ],
     },
     cart: {

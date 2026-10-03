@@ -11,8 +11,8 @@ export default function Footer() {
   ];
 
   const socials = [
-    { name: "Instagram", link: "https://instagram.com", Icon: Instagram, testid: "footer-social-instagram" },
-    { name: "TikTok", link: "https://tiktok.com", Icon: Music2, testid: "footer-social-tiktok" },
+    { name: "Instagram", link: "https://instagram.com/winorwins.co", Icon: Instagram, testid: "footer-social-instagram" },
+    { name: "TikTok", link: "https://tiktok.com/@winorwins.co", Icon: Music2, testid: "footer-social-tiktok" },
   ];
 
   return (

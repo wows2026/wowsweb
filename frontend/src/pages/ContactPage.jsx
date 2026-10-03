@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowUpRight, Instagram, Facebook, Music2, ArrowRight } from "lucide-react";
+import { ArrowUpRight, Instagram, Music2, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import axios from "axios";
 import { useLanguage } from "@/i18n";
@@ -13,9 +13,8 @@ export default function ContactPage() {
   const [sending, setSending] = useState(false);
 
   const socials = [
-    { name: "Instagram", link: "https://instagram.com", Icon: Instagram, testid: "contact-instagram" },
-    { name: "TikTok", link: "https://tiktok.com", Icon: Music2, testid: "contact-tiktok" },
-    { name: "Facebook", link: "https://facebook.com", Icon: Facebook, testid: "contact-facebook" },
+    { name: "Instagram", link: "https://instagram.com/winorwins.co", Icon: Instagram, testid: "contact-instagram" },
+    { name: "TikTok", link: "https://tiktok.com/@winorwins.co", Icon: Music2, testid: "contact-tiktok" },
   ];
 
   const set = (key) => (e) => setForm((f) => ({ ...f, [key]: e.target.value }));
