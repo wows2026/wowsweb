@@ -78,6 +78,12 @@ Architecture: Emergent React frontend → FastAPI backend proxy → Shopify Stor
 - Lock page additions: pill email form (black border/placeholder/button), "JOIN THE WAITLIST" headline, live countdown timer (DROP_DATE in LockScreen.jsx = **2026-11-11 11:11 CET**, user-confirmed)
 - Navbar menu simplified per user: HOME (/) + SHOP (/collection) + CONTACT (/contact); LOOKBOOK and SOCIALS links removed (pages still exist at /lookbook, /socials)
 
+## Contact form (2026-10-03, user feedback round 8)
+- /contact page: two-column — left CONTACT info/email/socials, right form (name, email, message) in existing design
+- POST /api/contact → managed Resend (Emergent email proxy, EMERGENT_EMAIL_KEY in backend .env) → delivers to **info@winorwins.com** (customer support inbox per user; admin@winorwins.com reserved for admin, not used by form)
+- EMAIL_FROM_NAME="WINORWINS", EMAIL_REPLY_TO=info@winorwins.com; guardrail gate _assert_safe_email on every send; recipient/subject/template fixed server-side, fields escaped
+- Verified: curl send returned email_id, invalid email → 422, UI submission shows success toast + clears form
+
 ## Iteration 2026-09-26 (user feedback round 3)
 - Hero: quote enlarged (text-6xl desktop), removed "DROP 001 — LIVE NOW" eyebrow, removed subtext, meta bar now shows only centered SCROLL indicator (PRG—LDN—TYO and 500 GSM removed)
 - Removed eyebrows: FEATURED // DROP 001 (products), CAMPAIGN 01 (lookbook), COMMUNITY (social), // NEWSLETTER (newsletter)
