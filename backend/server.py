@@ -1,5 +1,6 @@
 import os
 import re
+import time
 import logging
 import ipaddress
 from html import escape
@@ -13,7 +14,7 @@ from dotenv import load_dotenv
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / ".env")
 
-from fastapi import FastAPI, APIRouter, HTTPException
+from fastapi import FastAPI, APIRouter, HTTPException, Request
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel, field_validator
@@ -523,6 +524,114 @@ async def send_email(*, to: str, subject: str, html: str, reply_to: str = None):
     except Exception as e:
         logger.error("Email send error: %s", str(e))
         raise HTTPException(status_code=500, detail="Failed to send email")
+
+
+ECOMAIL_API_KEY = os.environ.get("ECOMAIL_API_KEY")
+ECOMAIL_LIST_ID = os.environ.get("ECOMAIL_LIST_ID")
+ECOMAIL_URL = f"https://api2.ecomailapp.cz/lists/{ECOMAIL_LIST_ID}/subscribe"
+
+CUSTOMER_TAGS_ADD = """
+mutation TagsAdd($id: ID!, $tags: [String!]!) {
+  tagsAdd(id: $id, tags: $tags) {
+    node { id }
+    userErrors { field message }
+  }
+}
+"""
+
+_rate_limit = {}
+
+
+class WaitlistSubscribe(BaseModel):
+    email: str
+    marketingConsent: bool = True
+
+    @field_validator("email")
+    @classmethod
+    def validate_email(cls, v: str) -> str:
+        v = v.strip().lower()
+        if not EMAIL_RE.match(v):
+            raise ValueError("Invalid email address")
+        return v
+
+
+async def _ecomail_subscribe(email: str):
+    payload = {
+        "subscriber_data": {
+            "email": email,
+            "source": "locked-page",
+            "custom_fields": {"lead_source": "locked-page"},
+            "status": 1,
+        },
+        "trigger_autoresponders": False,
+        "update_existing": True,
+        "resubscribe": False,
+        "skip_double_optin": True,
+    }
+    async with httpx.AsyncClient(timeout=20) as http_client:
+        resp = await http_client.post(
+            ECOMAIL_URL,
+            headers={"key": ECOMAIL_API_KEY, "Content-Type": "application/json"},
+            json=payload,
+        )
+    if resp.status_code >= 400:
+        logger.error("Ecomail subscribe failed %s: %s", resp.status_code, resp.text[:300])
+        raise ShopifyError("ecomail_error")
+    return resp.json()
+
+
+@api_router.post("/waitlist")
+async def waitlist_subscribe(input: WaitlistSubscribe, request: Request):
+    forwarded = request.headers.get("x-forwarded-for", "")
+    client_ip = forwarded.split(",")[0].strip() if forwarded else (request.client.host if request.client else "unknown")
+    now = time.time()
+    hits = [t for t in _rate_limit.get(client_ip, []) if now - t < 60]
+    if len(hits) >= 5:
+        raise HTTPException(status_code=429, detail="too_many_requests")
+    hits.append(now)
+    _rate_limit[client_ip] = hits
+
+    email = input.email
+    shopify_ok = False
+    ecomail_ok = False
+
+    try:
+        consent = {"marketingState": "SUBSCRIBED", "marketingOptInLevel": "SINGLE_OPT_IN"} if input.marketingConsent else None
+        create_input = {"email": email, "tags": ["locked-page"]}
+        if consent:
+            create_input["emailMarketingConsent"] = consent
+        data = await admin_query(CUSTOMER_CREATE, {"input": create_input})
+        res = data["customerCreate"]
+        if res["userErrors"]:
+            msg = _user_error(res["userErrors"]).lower()
+            if "taken" in msg or "already" in msg or "exist" in msg:
+                shopify_ok = True
+                try:
+                    found = await admin_query(CUSTOMER_BY_EMAIL, {"query": f"email:{email}"})
+                    edges = found["customers"]["edges"]
+                    if edges:
+                        cid = edges[0]["node"]["id"]
+                        await admin_query(CUSTOMER_TAGS_ADD, {"id": cid, "tags": ["locked-page"]})
+                        if consent:
+                            await admin_query(CUSTOMER_UPDATE, {"input": {"id": cid, "emailMarketingConsent": consent}})
+                except ShopifyError:
+                    logger.warning("waitlist: tag update skipped for existing %s", email)
+            else:
+                logger.error("waitlist customerCreate userErrors: %s", res["userErrors"])
+        else:
+            shopify_ok = True
+    except ShopifyError:
+        logger.exception("waitlist: shopify failed for a signup")
+
+    try:
+        await _ecomail_subscribe(email)
+        ecomail_ok = True
+    except Exception:
+        logger.exception("waitlist: ecomail failed for a signup")
+
+    if not shopify_ok and not ecomail_ok:
+        raise HTTPException(status_code=502, detail="signup_unavailable")
+    return {"status": "ok", "email": email, "shopify": shopify_ok, "ecomail": ecomail_ok}
 
 
 class UnlockInput(BaseModel):

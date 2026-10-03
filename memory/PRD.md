@@ -90,6 +90,13 @@ Architecture: Emergent React frontend → FastAPI backend proxy → Shopify Stor
 - Route /legal/:slug → LegalPage.jsx (Czech text in both language modes); footer legal/care links now navigate there (Size Guide still placeholder)
 - To update legal texts: edit docx, re-run python3 /app/scripts/extract_legal.py
 
+## Waitlist — Shopify + Ecomail (2026-10-03)
+- Lock page form now posts ONE request to POST /api/waitlist {email, marketingConsent} (was /api/newsletter; newsletter endpoint unchanged, still used by landing/newsletter section)
+- /api/waitlist fans out server-side: Shopify Admin (customerCreate with tags=["locked-page"], SINGLE_OPT_IN consent; existing email → tagsAdd "locked-page", no duplicate) AND Ecomail (POST /lists/2/subscribe, update_existing=true, source/custom field lead_source=locked-page, status=1 single opt-in, skip_double_optin, no autoresponders, resubscribe=false)
+- Independent failure handling per service, both-fail → 502; rate limit 5 req/min per real visitor IP via X-Forwarded-For (ingress proxies client.host!)
+- Ecomail: ECOMAIL_API_KEY + ECOMAIL_LIST_ID=2 ("winorwins waitlist emails") in backend/.env
+- Verified: new email → both true; repeat → no dupes; existing Shopify customer → tagged ok; invalid → 422; 6th rapid request → 429; Ecomail list checked via API (status 1, source locked-page); UI success message shown
+
 ## Iteration 2026-09-26 (user feedback round 3)
 - Hero: quote enlarged (text-6xl desktop), removed "DROP 001 — LIVE NOW" eyebrow, removed subtext, meta bar now shows only centered SCROLL indicator (PRG—LDN—TYO and 500 GSM removed)
 - Removed eyebrows: FEATURED // DROP 001 (products), CAMPAIGN 01 (lookbook), COMMUNITY (social), // NEWSLETTER (newsletter)

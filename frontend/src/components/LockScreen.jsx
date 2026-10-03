@@ -38,7 +38,7 @@ export default function LockScreen({ onUnlock }) {
     if (emailLoading) return;
     setEmailLoading(true);
     try {
-      await axios.post(`${API}/newsletter`, { email });
+      await axios.post(`${API}/waitlist`, { email, marketingConsent: true });
       setEmailDone(true);
     } catch (err) {
       if (err?.response?.status === 409) setEmailDone(true);
