@@ -21,6 +21,7 @@ import ProductPage from "@/pages/ProductPage";
 import LookbookPage from "@/pages/LookbookPage";
 import SocialsPage from "@/pages/SocialsPage";
 import ContactPage from "@/pages/ContactPage";
+import LegalPage from "@/pages/LegalPage";
 
 function Landing() {
   return (
@@ -87,6 +88,7 @@ export default function App() {
               <Route path="/lookbook" element={<LookbookPage />} />
               <Route path="/socials" element={<SocialsPage />} />
               <Route path="/contact" element={<ContactPage />} />
+              <Route path="/legal/:slug" element={<LegalPage />} />
               <Route path="*" element={<Landing />} />
             </Routes>
             <Footer />

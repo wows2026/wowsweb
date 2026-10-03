@@ -1,14 +1,32 @@
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Instagram } from "lucide-react";
 import { useLanguage } from "@/i18n";
 import TikTokIcon from "@/components/TikTokIcon";
 
 export default function Footer() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
 
   const columns = [
-    { title: t.footer.headings.legal, links: t.footer.legal, prefix: "footer-legal" },
-    { title: t.footer.headings.care, links: t.footer.care, prefix: "footer-care" },
+    {
+      title: t.footer.headings.legal,
+      prefix: "footer-legal",
+      items: [
+        { label: lang === "cz" ? "Obchodní podmínky" : "Terms & Conditions", to: "/legal/terms" },
+        { label: lang === "cz" ? "Ochrana osobních údajů" : "Privacy Policy", to: "/legal/privacy" },
+        { label: lang === "cz" ? "Nastavení cookies" : "Cookie Settings", to: "/legal/cookies" },
+      ],
+    },
+    {
+      title: t.footer.headings.care,
+      prefix: "footer-care",
+      items: [
+        { label: lang === "cz" ? "Podmínky dopravy" : "Shipping Policy", to: "/legal/shipping" },
+        { label: lang === "cz" ? "Vrácení zboží" : "Refund Policy", to: "/legal/refund" },
+        { label: lang === "cz" ? "Tabulka velikostí" : "Size Guide", to: null },
+        { label: lang === "cz" ? "Kontakt" : "Contact Us", to: "/contact" },
+      ],
+    },
   ];
 
   const socials = [
@@ -38,16 +56,21 @@ export default function Footer() {
             <div key={col.title}>
               <p className="mb-4 font-mono text-[10px] font-bold tracking-[0.25em] text-zinc-500">{col.title}</p>
               <ul className="space-y-2.5">
-                {col.links.map((link, i) => (
-                  <li key={link}>
-                    <a
-                      href="#contact"
-                      onClick={(e) => e.preventDefault()}
-                      data-testid={`${col.prefix}-link-${i}`}
-                      className="text-sm text-zinc-400 transition-colors hover:text-[#FFE600]"
-                    >
-                      {link}
-                    </a>
+                {col.items.map((item, i) => (
+                  <li key={item.label}>
+                    {item.to ? (
+                      <Link
+                        to={item.to}
+                        data-testid={`${col.prefix}-link-${i}`}
+                        className="text-sm text-zinc-400 transition-colors hover:text-[#FFE600]"
+                      >
+                        {item.label}
+                      </Link>
+                    ) : (
+                      <span data-testid={`${col.prefix}-link-${i}`} className="text-sm text-zinc-600">
+                        {item.label}
+                      </span>
+                    )}
                   </li>
                 ))}
               </ul>

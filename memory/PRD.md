@@ -84,6 +84,12 @@ Architecture: Emergent React frontend → FastAPI backend proxy → Shopify Stor
 - EMAIL_FROM_NAME="WINORWINS", EMAIL_REPLY_TO=info@winorwins.com; guardrail gate _assert_safe_email on every send; recipient/subject/template fixed server-side, fields escaped
 - Verified: curl send returned email_id, invalid email → 422, UI submission shows success toast + clears form
 
+## Legal pages (2026-10-03)
+- User uploaded Pravni_texty_eshop_obleceni.docx (stored /app/scripts/pravni.docx); /app/scripts/extract_legal.py converts it to /app/frontend/src/legalContent.js (5 docs: terms, refund, shipping, privacy, cookies)
+- Placeholders filled: WINORWINS, winorwins.co, info@winorwins.com, effective date 03. 10. 2026, operator Dang Manh Nguyen IČO 23161850 (from doc), Teya/Shopify Payments, Shopify platform; optional/irrelevant variants dropped
+- Route /legal/:slug → LegalPage.jsx (Czech text in both language modes); footer legal/care links now navigate there (Size Guide still placeholder)
+- To update legal texts: edit docx, re-run python3 /app/scripts/extract_legal.py
+
 ## Iteration 2026-09-26 (user feedback round 3)
 - Hero: quote enlarged (text-6xl desktop), removed "DROP 001 — LIVE NOW" eyebrow, removed subtext, meta bar now shows only centered SCROLL indicator (PRG—LDN—TYO and 500 GSM removed)
 - Removed eyebrows: FEATURED // DROP 001 (products), CAMPAIGN 01 (lookbook), COMMUNITY (social), // NEWSLETTER (newsletter)
