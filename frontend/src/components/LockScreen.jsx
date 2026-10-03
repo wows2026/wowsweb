@@ -5,7 +5,7 @@ import axios from "axios";
 import { useLanguage } from "@/i18n";
 import { API } from "@/shop";
 
-const DROP_DATE = new Date("2026-10-31T19:00:00+01:00").getTime();
+const DROP_DATE = new Date("2026-11-11T11:11:00+01:00").getTime();
 
 function useCountdown() {
   const [now, setNow] = useState(Date.now());

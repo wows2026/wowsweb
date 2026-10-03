@@ -9,9 +9,8 @@ export const LOOKBOOK_IMAGES = [
 export const translations = {
   en: {
     nav: {
-      collection: "COLLECTION",
-      lookbook: "LOOKBOOK",
-      community: "SOCIALS",
+      home: "HOME",
+      collection: "SHOP",
       contact: "CONTACT",
     },
     hero: {
@@ -109,9 +108,8 @@ export const translations = {
   },
   cz: {
     nav: {
-      collection: "KOLEKCE",
-      lookbook: "LOOKBOOK",
-      community: "SOCIÁLNÍ SÍTĚ",
+      home: "HOME",
+      collection: "SHOP",
       contact: "KONTAKT",
     },
     hero: {

@@ -24,9 +24,8 @@ export default function Navbar() {
   }, []);
 
   const links = [
+    { to: "/", label: t.nav.home, testid: "nav-link-home" },
     { to: "/collection", label: t.nav.collection, testid: "nav-link-collection" },
-    { to: "/lookbook", label: t.nav.lookbook, testid: "nav-link-lookbook" },
-    { to: "/socials", label: t.nav.community, testid: "nav-link-community" },
     { to: "/contact", label: t.nav.contact, testid: "nav-link-contact" },
   ];
 
