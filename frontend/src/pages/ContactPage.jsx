@@ -45,15 +45,6 @@ export default function ContactPage() {
           >
             {t.contact.title}
           </MaskedTitle>
-          <motion.p
-            initial={{ opacity: 0, y: 14 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.7 }}
-            className="mt-6 max-w-md text-sm text-zinc-600 sm:text-base"
-            data-testid="contact-sub"
-          >
-            {t.contact.sub}
-          </motion.p>
           <motion.a
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}

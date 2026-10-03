@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { Instagram, Music2 } from "lucide-react";
 import { useLanguage } from "@/i18n";
 
 export default function Footer() {
@@ -7,7 +8,11 @@ export default function Footer() {
   const columns = [
     { title: t.footer.headings.legal, links: t.footer.legal, prefix: "footer-legal" },
     { title: t.footer.headings.care, links: t.footer.care, prefix: "footer-care" },
-    { title: t.footer.headings.socials, links: ["Instagram", "TikTok", "Facebook"], prefix: "footer-social" },
+  ];
+
+  const socials = [
+    { name: "Instagram", link: "https://instagram.com", Icon: Instagram, testid: "footer-social-instagram" },
+    { name: "TikTok", link: "https://tiktok.com", Icon: Music2, testid: "footer-social-tiktok" },
   ];
 
   return (
@@ -47,6 +52,24 @@ export default function Footer() {
               </ul>
             </div>
           ))}
+          <div>
+            <p className="mb-4 font-mono text-[10px] font-bold tracking-[0.25em] text-zinc-500">{t.footer.headings.socials}</p>
+            <div className="flex gap-3">
+              {socials.map(({ name, link, Icon, testid }) => (
+                <a
+                  key={name}
+                  href={link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-testid={testid}
+                  aria-label={name}
+                  className="flex h-10 w-10 items-center justify-center border border-zinc-700 text-zinc-400 transition-colors hover:border-[#FFE600] hover:bg-[#FFE600] hover:text-black"
+                >
+                  <Icon className="h-5 w-5" />
+                </a>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 

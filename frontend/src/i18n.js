@@ -38,7 +38,6 @@ export const translations = {
     },
     contact: {
       title: "CONTACT",
-      sub: "Orders, collabs or press — write us.",
       follow: "FOLLOW US",
       formName: "NAME",
       formEmail: "EMAIL",
@@ -108,7 +107,7 @@ export const translations = {
       headings: { legal: "LEGAL", care: "CUSTOMER CARE", socials: "SOCIALS" },
       legal: ["Terms & Conditions", "Privacy Policy", "Cookie Settings"],
       care: ["Shipping & Returns", "Size Guide", "Contact Us"],
-      email: "contact@winorwins.com",
+      email: "info@winorwins.com",
       copyright: "© 2026 WINORWINS CLOTHING CO. ALL RIGHTS RESERVED.",
       made: "DESIGNED IN PRAGUE",
     },
@@ -144,7 +143,6 @@ export const translations = {
     },
     contact: {
       title: "KONTAKT",
-      sub: "Objednávky, spolupráce nebo press — napiš nám.",
       follow: "SLEDUJ NÁS",
       formName: "JMÉNO",
       formEmail: "EMAIL",
@@ -214,7 +212,7 @@ export const translations = {
       headings: { legal: "PRÁVNÍ", care: "ZÁKAZNICKÁ PÉČE", socials: "SOCIÁLNÍ SÍTĚ" },
       legal: ["Obchodní podmínky", "Ochrana osobních údajů", "Nastavení cookies"],
       care: ["Doprava a vrácení", "Tabulka velikostí", "Kontakt"],
-      email: "contact@winorwins.com",
+      email: "info@winorwins.com",
       copyright: "© 2026 WINORWINS CLOTHING CO. VŠECHNA PRÁVA VYHRAZENA.",
       made: "NAVRŽENO V PRAZE",
     },
