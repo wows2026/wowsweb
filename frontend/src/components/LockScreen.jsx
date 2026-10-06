@@ -61,15 +61,17 @@ export default function LockScreen({ onUnlock }) {
         className="w-[72vw] max-w-md"
         data-testid="lock-logo"
       />
-      <motion.p
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.4, duration: 0.7 }}
-        className="mt-6 font-mono text-[11px] font-bold tracking-[0.3em] text-black/60"
-        data-testid="lock-tagline"
+      <motion.div
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.45, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+        className="mt-8 text-center font-display uppercase"
+        data-testid="lock-wip"
       >
-        {t.locked.tagline}
-      </motion.p>
+        <p className="text-xl font-extrabold tracking-tight sm:text-2xl">{t.locked.wip1}</p>
+        <p className="mt-3 text-xs font-bold tracking-[0.15em] text-black/70 sm:text-sm">{t.locked.wip2}</p>
+        <p className="mt-1 text-xs font-bold tracking-[0.15em] text-black/70 sm:text-sm">{t.locked.wip3}</p>
+      </motion.div>
 
       <motion.p
         initial={{ opacity: 0, y: 14 }}

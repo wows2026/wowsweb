@@ -78,6 +78,9 @@ export const translations = {
       secure: "SECURE CHECKOUT — SHOPIFY · TEYA",
     },
     locked: {
+      wip1: "WORK IN PROGRESS. RIGHT NOW.",
+      wip2: "WE'RE BUILDING THE SITE AS YOU READ THIS.",
+      wip3: "COME BACK SOON.",
       tagline: "DROP 001 — COMING SOON",
       waitlist: "JOIN THE WAITLIST",
       days: "DAYS",
@@ -182,6 +185,9 @@ export const translations = {
       secure: "ZABEZPEČENÁ PLATBA — SHOPIFY · TEYA",
     },
     locked: {
+      wip1: "PRACUJEME NA TOM. PRÁVĚ TEĎ.",
+      wip2: "WEB STAVÍME, ZATÍMCO TO ČTEŠ.",
+      wip3: "VRAŤ SE BRZY.",
       tagline: "DROP 001 — JIŽ BRZY",
       waitlist: "PŘIDEJ SE NA WAITLIST",
       days: "DNÍ",
