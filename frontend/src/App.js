@@ -49,6 +49,15 @@ export default function App() {
   const [unlocked, setUnlocked] = useState(() => localStorage.getItem("wino_unlocked") === "1");
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("lock") === "1") {
+      localStorage.removeItem("wino_unlocked");
+      setUnlocked(false);
+      window.history.replaceState({}, "", window.location.pathname);
+    }
+  }, []);
+
+  useEffect(() => {
     const lenis = new Lenis({ duration: 1.15, smoothWheel: true });
     window.__lenis = lenis;
     let raf;
