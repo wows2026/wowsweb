@@ -78,9 +78,7 @@ export const translations = {
       secure: "SECURE CHECKOUT — SHOPIFY · TEYA",
     },
     locked: {
-      wip1: "WE'RE ON IT.",
-      wip2: "THE SITE IS BEING BUILT RIGHT NOW.",
-      waitlistSub: "BE FIRST WHEN DROP 01 OPENS.",
+      waitlistSub: "OUR FIRST DROP IS COMING. BE THE FIRST TO KNOW.",
       tagline: "DROP 001 — COMING SOON",
       waitlist: "JOIN THE WAITLIST",
       days: "DAYS",
@@ -185,9 +183,7 @@ export const translations = {
       secure: "ZABEZPEČENÁ PLATBA — SHOPIFY · TEYA",
     },
     locked: {
-      wip1: "UŽ NA TOM MAKÁME.",
-      wip2: "WEB SE PRÁVĚ STAVÍ.",
-      waitlistSub: "BUĎ PRVNÍ, AŽ SE DROP 01 OTEVŘE.",
+      waitlistSub: "NÁŠ PRVNÍ DROP SE BLÍŽÍ. DOZVÍŠ SE TO PRVNÍ.",
       tagline: "DROP 001 — JIŽ BRZY",
       waitlist: "PŘIDEJ SE NA WAITLIST",
       days: "DNÍ",
