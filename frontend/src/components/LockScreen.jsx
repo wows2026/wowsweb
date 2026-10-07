@@ -65,7 +65,7 @@ export default function LockScreen({ onUnlock }) {
         initial={{ opacity: 0, y: 14 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.45, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-        className="mt-8 font-display text-2xl font-semibold tracking-tight text-black uppercase sm:text-3xl"
+        className="mt-8 text-center font-display text-2xl font-semibold tracking-tight text-black uppercase sm:text-3xl"
         data-testid="lock-waitlist"
       >
         {t.locked.waitlist}
@@ -75,7 +75,7 @@ export default function LockScreen({ onUnlock }) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.6, duration: 0.7 }}
-        className="mt-2 font-display text-xs font-bold tracking-[0.15em] text-black/70 uppercase sm:text-sm"
+        className="mt-2 text-center font-display text-[9px] font-bold tracking-[0.12em] whitespace-nowrap text-black/70 uppercase sm:text-sm sm:tracking-[0.15em]"
         data-testid="lock-waitlist-sub"
       >
         {t.locked.waitlistSub}
