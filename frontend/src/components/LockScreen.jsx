@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { KeyRound } from "lucide-react";
+import { Link } from "react-router-dom";
 import axios from "axios";
 import { useLanguage } from "@/i18n";
 import { API } from "@/shop";
@@ -10,6 +11,7 @@ export default function LockScreen({ onUnlock }) {
   const [email, setEmail] = useState("");
   const [emailDone, setEmailDone] = useState(false);
   const [emailLoading, setEmailLoading] = useState(false);
+  const [emailError, setEmailError] = useState(false);
   const [showPw, setShowPw] = useState(false);
   const [pw, setPw] = useState("");
   const [pwError, setPwError] = useState(false);
@@ -19,11 +21,13 @@ export default function LockScreen({ onUnlock }) {
     e.preventDefault();
     if (emailLoading) return;
     setEmailLoading(true);
+    setEmailError(false);
     try {
       await axios.post(`${API}/waitlist`, { email, marketingConsent: true });
       setEmailDone(true);
     } catch (err) {
       if (err?.response?.status === 409) setEmailDone(true);
+      else setEmailError(true);
     } finally {
       setEmailLoading(false);
     }
@@ -58,7 +62,7 @@ export default function LockScreen({ onUnlock }) {
         initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-        className="w-[72vw] max-w-md"
+        className="h-auto max-h-[30svh] w-[72vw] max-w-md object-contain"
         data-testid="lock-logo"
       />
       <motion.p
@@ -71,54 +75,68 @@ export default function LockScreen({ onUnlock }) {
         {t.locked.waitlist}
       </motion.p>
 
-      <motion.p
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.6, duration: 0.7 }}
-        className="mt-2 text-center font-display text-[9px] font-bold tracking-[0.12em] whitespace-nowrap text-black/70 uppercase sm:text-sm sm:tracking-[0.15em]"
-        data-testid="lock-waitlist-sub"
-      >
-        {t.locked.waitlistSub}
-      </motion.p>
-
-      {emailDone ? (
-        <motion.p
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mt-10 font-mono text-xs font-bold tracking-[0.2em] text-black"
-          data-testid="lock-email-success"
-        >
-          {t.locked.subscribed}
-        </motion.p>
-      ) : (
-        <motion.form
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.55, duration: 0.7 }}
-          onSubmit={submitEmail}
-          className="mt-5 flex w-full max-w-sm items-center gap-3"
-          data-testid="lock-email-form"
-        >
-          <input
-            type="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder={t.locked.emailPlaceholder}
-            data-testid="lock-email-input"
-            className="h-14 min-w-0 flex-1 rounded-full border border-black bg-transparent px-6 text-center text-sm font-medium text-black outline-none placeholder-black"
-          />
-          <motion.button
-            type="submit"
-            whileTap={{ scale: 0.96 }}
-            disabled={emailLoading}
-            data-testid="lock-email-submit"
-            className="h-14 shrink-0 rounded-full bg-black px-5 text-[13px] font-bold tracking-[0.2em] whitespace-nowrap text-[#FFE600] transition-opacity disabled:opacity-60 sm:px-8 sm:text-sm sm:tracking-[0.25em]"
+      {/* Fixed-height slot: swapping the form for the success message must not shift the logo */}
+      <div className="mt-5 flex min-h-[108px] w-full max-w-sm flex-col items-center justify-center [@media(max-height:500px)]:max-w-xs">
+        {emailDone ? (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center"
+            role="status"
+            data-testid="lock-email-success"
           >
-            {emailLoading ? "..." : t.locked.notify}
-          </motion.button>
-        </motion.form>
-      )}
+            <p className="font-mono text-xs font-bold tracking-[0.2em] text-black">{t.locked.subscribed}</p>
+            <p className="mt-2 text-xs text-balance text-black/70">{t.locked.subscribedSub}</p>
+          </motion.div>
+        ) : (
+          <>
+            <motion.form
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.55, duration: 0.7 }}
+              onSubmit={submitEmail}
+              className="flex w-full items-center gap-3"
+              data-testid="lock-email-form"
+            >
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder={t.locked.emailPlaceholder}
+                data-testid="lock-email-input"
+                className="h-14 min-w-0 flex-1 rounded-full border border-black bg-transparent px-6 text-center text-base font-medium text-black sm:text-sm outline-none placeholder-black"
+              />
+              <motion.button
+                type="submit"
+                whileTap={{ scale: 0.96 }}
+                disabled={emailLoading}
+                data-testid="lock-email-submit"
+                className="h-14 shrink-0 rounded-full bg-black px-5 text-[13px] font-bold tracking-[0.2em] whitespace-nowrap text-[#FFE600] transition-opacity disabled:opacity-60 sm:px-8 sm:text-sm sm:tracking-[0.25em]"
+              >
+                {emailLoading ? "..." : t.locked.notify}
+              </motion.button>
+            </motion.form>
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.7, duration: 0.7 }}
+              className="mt-3 text-center text-[11px] leading-relaxed text-balance text-black/60"
+              data-testid="lock-consent"
+            >
+              {t.locked.consent}{" "}
+              <Link to="/legal/privacy" className="underline underline-offset-2 hover:text-black" data-testid="lock-privacy-link">
+                {t.locked.privacy}
+              </Link>
+            </motion.p>
+            {emailError && (
+              <p className="mt-2 font-mono text-[10px] font-bold tracking-[0.2em] text-red-600" role="alert" data-testid="lock-email-error">
+                {t.locked.signupError}
+              </p>
+            )}
+          </>
+        )}
+      </div>
 
       <div className="absolute right-5 bottom-6 sm:right-8">
         {showPw ? (
@@ -136,7 +154,7 @@ export default function LockScreen({ onUnlock }) {
               onChange={(e) => setPw(e.target.value)}
               placeholder={t.locked.passwordPlaceholder}
               data-testid="lock-password-input"
-              className={`h-10 w-40 border-b-2 bg-transparent px-1 font-mono text-xs text-black outline-none placeholder-black/40 ${
+              className={`h-10 w-40 border-b-2 [@media(max-height:500px)]:w-28 bg-transparent px-1 font-mono text-base text-black sm:text-xs outline-none placeholder-black/40 ${
                 pwError ? "border-red-600" : "border-black"
               }`}
             />

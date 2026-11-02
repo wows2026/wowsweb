@@ -86,7 +86,7 @@ Architecture: Emergent React frontend → FastAPI backend proxy → Shopify Stor
 
 ## Legal pages (2026-10-03)
 - User uploaded Pravni_texty_eshop_obleceni.docx (stored /app/scripts/pravni.docx); /app/scripts/extract_legal.py converts it to /app/frontend/src/legalContent.js (5 docs: terms, refund, shipping, privacy, cookies)
-- Placeholders filled: WINORWINS, winorwins.co, info@winorwins.com, effective date 03. 10. 2026, operator Dang Manh Nguyen IČO 23161850 (from doc), Teya/Shopify Payments, Shopify platform; optional/irrelevant variants dropped
+- Placeholders filled: WINORWINS, winorwins.com, info@winorwins.com, effective date 03. 10. 2026, operator Dang Manh Nguyen IČO 23161850 (from doc), Teya/Shopify Payments, Shopify platform; optional/irrelevant variants dropped
 - Route /legal/:slug → LegalPage.jsx (Czech text in both language modes); footer legal/care links now navigate there (Size Guide still placeholder)
 - To update legal texts: edit docx, re-run python3 /app/scripts/extract_legal.py
 

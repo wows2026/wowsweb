@@ -45,6 +45,20 @@ function ScrollToTop() {
   return null;
 }
 
+// Legal pages stay readable while the site is locked (the lock screen links to the privacy policy).
+function SiteLock({ unlocked, onUnlock }) {
+  const { pathname } = useLocation();
+  const locked = !unlocked && !pathname.startsWith("/legal/");
+
+  useEffect(() => {
+    if (!window.__lenis) return;
+    if (locked) window.__lenis.stop();
+    else window.__lenis.start();
+  }, [locked]);
+
+  return <AnimatePresence>{locked && <LockScreen onUnlock={onUnlock} />}</AnimatePresence>;
+}
+
 export default function App() {
   const [unlocked, setUnlocked] = useState(() => localStorage.getItem("wino_unlocked") === "1");
 
@@ -73,12 +87,6 @@ export default function App() {
     };
   }, []);
 
-  useEffect(() => {
-    if (!window.__lenis) return;
-    if (unlocked) window.__lenis.start();
-    else window.__lenis.stop();
-  }, [unlocked]);
-
   return (
     <LanguageProvider>
       <CartProvider>
@@ -86,9 +94,7 @@ export default function App() {
           <ScrollToTop />
           <div className="min-h-screen bg-[#FAF9F6] font-sans text-[#0D0D0D] antialiased">
             <div className="grain" aria-hidden="true" />
-            <AnimatePresence>
-              {!unlocked && <LockScreen onUnlock={() => setUnlocked(true)} />}
-            </AnimatePresence>
+            <SiteLock unlocked={unlocked} onUnlock={() => setUnlocked(true)} />
             <Navbar />
             <Routes>
               <Route path="/" element={<Landing />} />

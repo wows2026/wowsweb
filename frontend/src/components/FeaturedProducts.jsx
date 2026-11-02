@@ -4,7 +4,7 @@ import { ArrowUpRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { useLanguage } from "@/i18n";
-import { API } from "@/shop";
+import { API, useCart } from "@/shop";
 import MaskedTitle from "@/components/MaskedTitle";
 import ProductCard from "@/components/ProductCard";
 
@@ -47,14 +47,25 @@ export function ProductsGrid({ products, failed }) {
 }
 
 export function useProducts() {
+  const { currency } = useCart();
   const [products, setProducts] = useState(null);
   const [failed, setFailed] = useState(false);
   useEffect(() => {
+    let ignore = false;
     axios
-      .get(`${API}/products`)
-      .then((r) => setProducts(r.data))
-      .catch(() => setFailed(true));
-  }, []);
+      .get(`${API}/products`, { params: { currency } })
+      .then((r) => {
+        if (ignore) return;
+        setProducts(r.data);
+        setFailed(false);
+      })
+      .catch(() => {
+        if (!ignore) setFailed(true);
+      });
+    return () => {
+      ignore = true;
+    };
+  }, [currency]);
   return { products, failed };
 }
 

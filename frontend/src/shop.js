@@ -3,6 +3,7 @@ import axios from "axios";
 
 export const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const CART_KEY = "wino_cart_id";
+const CURRENCY_KEY = "wino_currency";
 
 export function formatPrice(money, lang) {
   if (!money) return "";
@@ -20,6 +21,7 @@ export function CartProvider({ children }) {
   const [cart, setCart] = useState(null);
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [currency, setCurrencyState] = useState(() => (localStorage.getItem(CURRENCY_KEY) === "EUR" ? "EUR" : "CZK"));
 
   useEffect(() => {
     const id = localStorage.getItem(CART_KEY);
@@ -39,8 +41,27 @@ export function CartProvider({ children }) {
   };
 
   const createCart = async (variantId, quantity) => {
-    const r = await axios.post(`${API}/cart`, { variant_id: variantId, quantity });
+    const r = await axios.post(`${API}/cart`, { variant_id: variantId, quantity, currency });
     save(r.data);
+  };
+
+  const setCurrency = async (next) => {
+    if (next === currency) return;
+    setCurrencyState(next);
+    localStorage.setItem(CURRENCY_KEY, next);
+    if (!cart) return;
+    setBusy(true);
+    try {
+      const r = await axios.post(`${API}/cart/currency`, { cart_id: cart.id, currency: next });
+      save(r.data);
+    } catch (e) {
+      if (e?.response?.status === 404) {
+        setCart(null);
+        localStorage.removeItem(CART_KEY);
+      }
+    } finally {
+      setBusy(false);
+    }
   };
 
   const addLine = async (variantId, quantity = 1) => {
@@ -99,7 +120,7 @@ export function CartProvider({ children }) {
   };
 
   return (
-    <CartContext.Provider value={{ cart, open, setOpen, busy, addLine, updateLine, removeLine, applyDiscount }}>
+    <CartContext.Provider value={{ cart, open, setOpen, busy, currency, setCurrency, addLine, updateLine, removeLine, applyDiscount }}>
       {children}
     </CartContext.Provider>
   );

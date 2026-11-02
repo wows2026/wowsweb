@@ -10,7 +10,7 @@ import { useCart, formatPrice, API } from "@/shop";
 export default function ProductPage() {
   const { handle } = useParams();
   const { t, lang } = useLanguage();
-  const { addLine, busy } = useCart();
+  const { addLine, busy, currency } = useCart();
   const [product, setProduct] = useState(undefined);
   const [selected, setSelected] = useState({});
   const [activeImage, setActiveImage] = useState(0);
@@ -19,22 +19,36 @@ export default function ProductPage() {
     setProduct(undefined);
     setSelected({});
     setActiveImage(0);
+  }, [handle]);
+
+  // Refetches on currency switch too, keeping the shopper's size/colour selection.
+  useEffect(() => {
+    let ignore = false;
     axios
-      .get(`${API}/products`)
+      .get(`${API}/products`, { params: { currency } })
       .then((r) => {
+        if (ignore) return;
         const p = r.data.find((x) => x.handle === handle) || null;
         setProduct(p);
         if (p) {
-          const firstAvail = p.variants.find((v) => v.available) || p.variants[0];
-          const sel = {};
-          (firstAvail?.options || []).forEach((o) => {
-            sel[o.name] = o.value;
+          setSelected((prev) => {
+            if (Object.keys(prev).length) return prev;
+            const firstAvail = p.variants.find((v) => v.available) || p.variants[0];
+            const sel = {};
+            (firstAvail?.options || []).forEach((o) => {
+              sel[o.name] = o.value;
+            });
+            return sel;
           });
-          setSelected(sel);
         }
       })
-      .catch(() => setProduct(null));
-  }, [handle]);
+      .catch(() => {
+        if (!ignore) setProduct(null);
+      });
+    return () => {
+      ignore = true;
+    };
+  }, [handle, currency]);
 
   const optionGroups = useMemo(() => {
     if (!product) return [];

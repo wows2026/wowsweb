@@ -49,7 +49,7 @@ for style, text in raw:
 
 EXACT = {
     "[NÁZEV ZNAČKY]": "WINORWINS",
-    "[www.vaseznacka.cz]": "winorwins.co",
+    "[www.vaseznacka.cz]": "winorwins.com",
     "[info@vaseznacka.cz]": "info@winorwins.com",
     "[vraceni@vaseznacka.cz]": "info@winorwins.com",
     "[reklamace@vaseznacka.cz]": "info@winorwins.com",

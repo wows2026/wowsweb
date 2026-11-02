@@ -4,7 +4,7 @@ export const LEGAL_DOCS = {
     "content": [
       {
         "type": "p",
-        "text": "Internetový obchod WINORWINS na adrese winorwins.co. Účinné od 03. 10. 2026."
+        "text": "Internetový obchod WINORWINS na adrese winorwins.com. Účinné od 03. 10. 2026."
       },
       {
         "type": "h2",
@@ -12,7 +12,7 @@ export const LEGAL_DOCS = {
       },
       {
         "type": "li",
-        "text": "Tyto obchodní podmínky (dále jen „podmínky”) upravují práva a povinnosti mezi prodávajícím a kupujícím při prodeji zboží prostřednictvím internetového obchodu na adrese winorwins.co (dále jen „e-shop”)."
+        "text": "Tyto obchodní podmínky (dále jen „podmínky”) upravují práva a povinnosti mezi prodávajícím a kupujícím při prodeji zboží prostřednictvím internetového obchodu na adrese winorwins.com (dále jen „e-shop”)."
       },
       {
         "type": "li",
@@ -765,7 +765,7 @@ export const LEGAL_DOCS = {
       },
       {
         "type": "p",
-        "text": "Dang Manh Nguyen, IČO 23161850, se sídlem Chudenická 1059/30, Hostivař, 102 00 Praha 10, provozovatel e-shopu winorwins.co (dále „my”)."
+        "text": "Dang Manh Nguyen, IČO 23161850, se sídlem Chudenická 1059/30, Hostivař, 102 00 Praha 10, provozovatel e-shopu winorwins.com (dále „my”)."
       },
       {
         "type": "p",

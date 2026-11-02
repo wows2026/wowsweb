@@ -13,7 +13,7 @@ export function scrollToSection(id) {
 
 export default function Navbar() {
   const { t, lang, setLang } = useLanguage();
-  const { cart, setOpen } = useCart();
+  const { cart, setOpen, currency, setCurrency } = useCart();
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -74,6 +74,23 @@ export default function Navbar() {
               className={`px-2 py-1 transition-colors ${lang === "cz" ? "bg-[#0D0D0D] text-[#FFE600]" : "text-zinc-500 hover:text-black"}`}
             >
               CZ
+            </button>
+          </div>
+          <div className="flex items-center gap-1 font-mono text-[11px] font-bold tracking-widest" data-testid="currency-toggle">
+            <button
+              data-testid="currency-czk-button"
+              onClick={() => setCurrency("CZK")}
+              className={`px-2 py-1 transition-colors ${currency === "CZK" ? "bg-[#0D0D0D] text-[#FFE600]" : "text-zinc-500 hover:text-black"}`}
+            >
+              Kč
+            </button>
+            <span className="text-zinc-300">/</span>
+            <button
+              data-testid="currency-eur-button"
+              onClick={() => setCurrency("EUR")}
+              className={`px-2 py-1 transition-colors ${currency === "EUR" ? "bg-[#0D0D0D] text-[#FFE600]" : "text-zinc-500 hover:text-black"}`}
+            >
+              EUR
             </button>
           </div>
           <button

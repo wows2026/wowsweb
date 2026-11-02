@@ -7,6 +7,7 @@ from html import escape
 from html.parser import HTMLParser
 from urllib.parse import urlparse
 from pathlib import Path
+from typing import Literal
 
 import httpx
 from dotenv import load_dotenv
@@ -32,6 +33,10 @@ logger = logging.getLogger(__name__)
 
 EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
+# Shopify prices by market; the EUR market ("Slovensko a EU") is priced through one of its countries.
+Currency = Literal["CZK", "EUR"]
+CURRENCY_COUNTRY = {"CZK": "CZ", "EUR": "SK"}
+
 COLOR_HEX = {
     "black": "#111111", "white": "#F5F5F5", "oatmeal": "#E7DECB", "bone": "#F2F0E9",
     "yellow": "#FFE600", "grey": "#9CA3AF", "gray": "#9CA3AF", "graphite": "#3F3F46",
@@ -41,7 +46,7 @@ COLOR_HEX = {
 }
 
 PRODUCTS_QUERY = """
-query Products($first: Int!) {
+query Products($first: Int!, $country: CountryCode!) @inContext(country: $country) {
   products(first: $first) {
     edges {
       node {
@@ -105,8 +110,8 @@ fragment CartData on Cart {
 """
 
 CART_CREATE = CART_FRAGMENT + """
-mutation CartCreate($lines: [CartLineInput!]!) {
-  cartCreate(input: { lines: $lines }) {
+mutation CartCreate($lines: [CartLineInput!]!, $country: CountryCode!) {
+  cartCreate(input: { lines: $lines, buyerIdentity: { countryCode: $country } }) {
     cart { ...CartData }
     userErrors { field message }
   }
@@ -155,6 +160,15 @@ query GetCart($id: ID!) {
 }
 """
 
+CART_BUYER_IDENTITY = CART_FRAGMENT + """
+mutation BuyerIdentity($cartId: ID!, $country: CountryCode!) {
+  cartBuyerIdentityUpdate(cartId: $cartId, buyerIdentity: { countryCode: $country }) {
+    cart { ...CartData }
+    userErrors { field message }
+  }
+}
+"""
+
 CUSTOMER_CREATE = """
 mutation CustomerCreate($input: CustomerInput!) {
   customerCreate(input: $input) {
@@ -197,8 +211,17 @@ class CartLineInputModel(BaseModel):
     quantity: int = 1
 
 
+class CartCreateModel(CartLineInputModel):
+    currency: Currency = "CZK"
+
+
 class CartLineAddModel(CartLineInputModel):
     cart_id: str
+
+
+class CartCurrencyModel(BaseModel):
+    cart_id: str
+    currency: Currency
 
 
 class CartLineUpdateModel(BaseModel):
@@ -306,9 +329,9 @@ async def root():
 
 
 @api_router.get("/products")
-async def list_products():
+async def list_products(currency: Currency = "CZK"):
     try:
-        data = await storefront_query(PRODUCTS_QUERY, {"first": 50})
+        data = await storefront_query(PRODUCTS_QUERY, {"first": 50, "country": CURRENCY_COUNTRY[currency]})
     except ShopifyError:
         raise HTTPException(status_code=502, detail="shopify_unavailable")
     return [_map_product(e["node"]) for e in data["products"]["edges"]]
@@ -326,13 +349,30 @@ async def get_cart(cart_id: str):
 
 
 @api_router.post("/cart")
-async def create_cart(input: CartLineInputModel):
+async def create_cart(input: CartCreateModel):
     try:
-        data = await storefront_query(CART_CREATE, {"lines": [{"merchandiseId": input.variant_id, "quantity": input.quantity}]})
+        data = await storefront_query(CART_CREATE, {
+            "lines": [{"merchandiseId": input.variant_id, "quantity": input.quantity}],
+            "country": CURRENCY_COUNTRY[input.currency],
+        })
     except ShopifyError:
         raise HTTPException(status_code=502, detail="shopify_unavailable")
     res = data["cartCreate"]
     if res["userErrors"]:
+        raise HTTPException(status_code=400, detail=_user_error(res["userErrors"]))
+    return map_cart(res["cart"])
+
+
+@api_router.post("/cart/currency")
+async def set_cart_currency(input: CartCurrencyModel):
+    try:
+        data = await storefront_query(CART_BUYER_IDENTITY, {"cartId": input.cart_id, "country": CURRENCY_COUNTRY[input.currency]})
+    except ShopifyError:
+        raise HTTPException(status_code=502, detail="shopify_unavailable")
+    res = data["cartBuyerIdentityUpdate"]
+    if res["userErrors"]:
+        if _is_not_found(res["userErrors"]):
+            raise HTTPException(status_code=404, detail="cart_not_found")
         raise HTTPException(status_code=400, detail=_user_error(res["userErrors"]))
     return map_cart(res["cart"])
 
