@@ -121,6 +121,10 @@ export const translations = {
       failedText: "Your card was not charged. Try again or use a different card.",
       expiredTitle: "PAYMENT EXPIRED",
       tryAgain: "TRY AGAIN",
+      boxChoose: "CHOOSE A BOX",
+      boxChange: "CHANGE",
+      boxHint: "Pick the DPD box or pickup point on the map.",
+      boxRequired: "Choose a DPD box for delivery.",
     },
     locked: {
       tagline: "DROP 001 — COMING SOON",
@@ -274,6 +278,10 @@ export const translations = {
       failedText: "Z karty se nic nestrhlo. Zkus to znovu nebo použij jinou kartu.",
       expiredTitle: "PLATBA VYPRŠELA",
       tryAgain: "ZKUSIT ZNOVU",
+      boxChoose: "VYBRAT BOX",
+      boxChange: "ZMĚNIT",
+      boxHint: "Vyber na mapě DPD box nebo výdejní místo.",
+      boxRequired: "Vyber DPD box, kam ti balík pošleme.",
     },
     locked: {
       tagline: "DROP 001 — JIŽ BRZY",

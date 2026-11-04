@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { Link, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Lock, Loader2 } from "lucide-react";
+import { Lock, Loader2, MapPin, X } from "lucide-react";
 import { toast } from "sonner";
 import axios from "axios";
 import { useLanguage } from "@/i18n";
@@ -10,6 +11,7 @@ import { API, useCart, formatPrice } from "@/shop";
 // The Shopify store ships to the EU; country names come from the browser in the page language.
 const COUNTRIES = ["CZ", "SK", "AT", "BE", "BG", "CY", "DE", "DK", "EE", "ES", "FI", "FR", "GR", "HR", "HU", "IE", "IT", "LT", "LU", "LV", "MT", "NL", "PL", "PT", "RO", "SE", "SI"];
 const FORM_KEY = "wino_checkout_form";
+const DPD_WIDGET = "https://api.dpd.cz/widget/latest/index.html";
 
 const labelCls = "mb-2 block font-mono text-[10px] font-bold tracking-[0.25em] text-zinc-500";
 const inputCls =
@@ -44,7 +46,29 @@ export default function CheckoutPage() {
   const [noShipping, setNoShipping] = useState(false);
   const [delivery, setDelivery] = useState(null);
   const [paying, setPaying] = useState(false);
+  const [pickup, setPickup] = useState(null);
+  const [mapOpen, setMapOpen] = useState(false);
   const quoteSeq = useRef(0);
+
+  // DPD's map runs in an iframe and posts the chosen box (or a close event) back to this window.
+  useEffect(() => {
+    if (!mapOpen) return;
+    const onMessage = (e) => {
+      if (e.origin !== new URL(DPD_WIDGET).origin || !e.data?.dpdWidget) return;
+      const w = e.data.dpdWidget;
+      if (w.id && w.location?.address) {
+        const a = w.location.address;
+        setPickup({ id: w.id, name: w.name || "", street: a.street || "", zip: a.zip || "", city: a.city || "", country: (a.country || "").toUpperCase() });
+      }
+      setMapOpen(false);
+    };
+    window.addEventListener("message", onMessage);
+    return () => window.removeEventListener("message", onMessage);
+  }, [mapOpen]);
+
+  useEffect(() => {
+    if (pickup && pickup.country && pickup.country !== form.country) setPickup(null);
+  }, [form.country]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const countryNames = useMemo(() => {
     const dn = new Intl.DisplayNames([lang === "cz" ? "cs" : "en"], { type: "region" });
@@ -115,13 +139,32 @@ export default function CheckoutPage() {
   const submit = async (e) => {
     e.preventDefault();
     if (paying || !delivery) return;
+    if (selected?.pickup && !pickup) {
+      setMapOpen(true);
+      return;
+    }
     setPaying(true);
     try {
-      const r = await axios.post(`${API}/checkout/start`, { cart_id: cart.id, ...form, delivery_handle: delivery, lang });
+      const r = await axios.post(`${API}/checkout/start`, {
+        cart_id: cart.id,
+        ...form,
+        delivery_handle: delivery,
+        pickup_point: selected?.pickup ? pickup : null,
+        lang,
+      });
       window.location.href = r.data.redirectUrl;
     } catch (err) {
       const code = err?.response?.data?.detail;
-      toast.error(code === "item_unavailable" ? c.soldOut : code === "payments_not_configured" || code === "payment_unavailable" ? c.unavailable : c.error);
+      if (code === "pickup_point_required" || code === "pickup_point_country") setPickup(null);
+      toast.error(
+        code === "item_unavailable"
+          ? c.soldOut
+          : code === "payments_not_configured" || code === "payment_unavailable"
+            ? c.unavailable
+            : code === "pickup_point_required" || code === "pickup_point_country"
+              ? c.boxRequired
+              : c.error
+      );
       setPaying(false);
     }
   };
@@ -193,17 +236,48 @@ export default function CheckoutPage() {
             ) : (
               <div className="flex flex-col gap-2" role="radiogroup">
                 {quote.options.map((o) => (
-                  <label
-                    key={o.handle}
-                    className={`flex cursor-pointer items-center justify-between gap-4 border-2 px-4 py-4 transition-colors ${delivery === o.handle ? "border-black" : "border-zinc-200 hover:border-zinc-400"}`}
-                    data-testid="checkout-shipping-option"
-                  >
-                    <span className="flex items-center gap-3">
-                      <input type="radio" name="delivery" value={o.handle} checked={delivery === o.handle} onChange={() => setDelivery(o.handle)} className="h-4 w-4 accent-black" />
-                      <span className="text-sm font-semibold">{o.title}</span>
-                    </span>
-                    <span className="text-sm font-bold">{o.amount ? money(o.amount) : c.free}</span>
-                  </label>
+                  <div key={o.handle} className={`border-2 transition-colors ${delivery === o.handle ? "border-black" : "border-zinc-200 hover:border-zinc-400"}`}>
+                    <label className="flex cursor-pointer items-center justify-between gap-4 px-4 py-4" data-testid="checkout-shipping-option">
+                      <span className="flex items-center gap-3">
+                        <input
+                          type="radio"
+                          name="delivery"
+                          value={o.handle}
+                          checked={delivery === o.handle}
+                          onChange={() => {
+                            setDelivery(o.handle);
+                            if (o.pickup && !pickup) setMapOpen(true);
+                          }}
+                          className="h-4 w-4 accent-black"
+                        />
+                        <span className="text-sm font-semibold">{o.title}</span>
+                      </span>
+                      <span className="text-sm font-bold">{o.amount ? money(o.amount) : c.free}</span>
+                    </label>
+                    {o.pickup && delivery === o.handle && (
+                      <div className="flex items-center justify-between gap-4 border-t border-zinc-200 px-4 py-3" data-testid="checkout-pickup">
+                        {pickup ? (
+                          <p className="flex min-w-0 items-start gap-2 text-xs">
+                            <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                            <span>
+                              <strong className="block">{pickup.name}</strong>
+                              {pickup.street}, {pickup.zip} {pickup.city}
+                            </span>
+                          </p>
+                        ) : (
+                          <p className="text-xs text-zinc-500">{c.boxHint}</p>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => setMapOpen(true)}
+                          data-testid="checkout-pickup-button"
+                          className="shrink-0 border border-black px-3 py-2 font-mono text-[10px] font-bold tracking-[0.2em] transition-colors hover:bg-black hover:text-[#FFE600]"
+                        >
+                          {pickup ? c.boxChange : c.boxChoose}
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 ))}
               </div>
             )}
@@ -218,7 +292,7 @@ export default function CheckoutPage() {
               data-testid="checkout-pay-button"
               className="flex w-full items-center justify-center gap-3 bg-[#0D0D0D] py-5 font-mono text-xs font-bold tracking-[0.25em] text-white transition-colors duration-300 hover:bg-[#FFE600] hover:text-black disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-[#0D0D0D] disabled:hover:text-white"
             >
-              {paying ? c.paying : `${c.pay} ${money(total)}`}
+              {paying ? c.paying : selected?.pickup && !pickup ? c.boxChoose : `${c.pay} ${money(total)}`}
               <Lock className="h-3.5 w-3.5" />
             </motion.button>
             <p className="mt-4 text-center text-[11px] leading-relaxed text-balance text-zinc-500">
@@ -270,6 +344,27 @@ export default function CheckoutPage() {
           </dl>
         </aside>
       </div>
+
+      {mapOpen &&
+        createPortal(
+        <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/50 sm:p-6" data-lenis-prevent data-testid="checkout-pickup-map">
+          <div className="relative flex h-full w-full max-w-5xl flex-col bg-white sm:h-[85vh]">
+            <div className="flex items-center justify-between bg-[#0D0D0D] px-5 py-3 text-[#FAF9F6]">
+              <p className="font-mono text-xs font-bold tracking-[0.25em]">{c.boxChoose}</p>
+              <button type="button" onClick={() => setMapOpen(false)} className="p-1 hover:text-[#FFE600]" aria-label="Close">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <iframe
+              title="DPD Pickup"
+              src={`${DPD_WIDGET}?hideCloseButton=true&countries=${form.country}&enabledCountries=${form.country}${lang === "cz" ? "" : "&lang=en"}`}
+              allow="geolocation"
+              className="w-full flex-1 border-0"
+            />
+          </div>
+        </div>,
+        document.body
+      )}
     </div>
   );
 }

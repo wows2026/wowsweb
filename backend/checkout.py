@@ -18,6 +18,8 @@ from typing import Literal, Optional
 from fastapi import APIRouter, HTTPException, Request, BackgroundTasks
 from pydantic import BaseModel, field_validator
 
+import httpx
+
 import teya_client as teya
 from shopify_client import storefront_query, admin_query, ShopifyError
 
@@ -27,6 +29,9 @@ ORDER_ALERT_RECIPIENT = os.environ.get("ORDER_ALERT_EMAIL", "info@winorwins.com"
 PUBLIC_SITE_URL = os.environ.get("PUBLIC_SITE_URL", "").rstrip("/")
 EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 PHONE_RE = re.compile(r"^\+?[0-9 ()-]{6,20}$")
+# Shopify rates named like "DPD – box" / "DPD Pickup" deliver to a point the customer picks on DPD's map.
+PICKUP_RE = re.compile(r"box|pickup|výdejn", re.I)
+DPD_PICKUP_URL = "https://api.dpd.cz/api/v1/pickup-points/{}"
 
 CHECKOUT_FRAGMENT = """
 fragment CheckoutCart on Cart {
@@ -133,10 +138,33 @@ class CheckoutAddress(BaseModel):
         return v
 
 
+class PickupPoint(BaseModel):
+    id: str
+    name: str = ""
+    street: str = ""
+    zip: str = ""
+    city: str = ""
+    country: str = ""
+
+    @field_validator("id")
+    @classmethod
+    def validate_id(cls, v: str) -> str:
+        v = v.strip()
+        if not re.fullmatch(r"[A-Za-z0-9_-]{2,40}", v):
+            raise ValueError("Invalid pickup point")
+        return v
+
+    @field_validator("name", "street", "zip", "city", "country")
+    @classmethod
+    def validate_text(cls, v: str) -> str:
+        return v.strip()[:120]
+
+
 class CheckoutStart(CheckoutAddress):
     email: str
     phone: str
     delivery_handle: str
+    pickup_point: Optional[PickupPoint] = None
     lang: Literal["cz", "en"] = "cz"
 
     @field_validator("email")
@@ -209,7 +237,8 @@ def _summary(cart: dict) -> dict:
     group = (cart.get("deliveryGroups") or {}).get("nodes") or []
     group = group[0] if group else None
     options = [
-        {"handle": o["handle"], "title": o["title"], "amount": float(_dec(o["estimatedCost"]["amount"]))}
+        {"handle": o["handle"], "title": o["title"], "amount": float(_dec(o["estimatedCost"]["amount"])),
+         "pickup": bool(PICKUP_RE.search(o["title"]))}
         for o in (group or {}).get("deliveryOptions") or []
     ]
     selected = (group or {}).get("selectedDeliveryOption")
@@ -230,6 +259,27 @@ def _summary(cart: dict) -> dict:
         "options": options,
         "total": float(total),
     }
+
+
+async def _dpd_point(point: "PickupPoint") -> dict:
+    """The point's address straight from DPD's public pickup API; the browser only supplies the ID."""
+    try:
+        async with httpx.AsyncClient(timeout=10) as client:
+            resp = await client.get(DPD_PICKUP_URL.format(point.id), headers={"Accept": "application/json"})
+        if 400 <= resp.status_code < 500:
+            raise HTTPException(status_code=400, detail="pickup_point_required")
+        resp.raise_for_status()
+        data = resp.json()
+        addr = (data.get("location") or {}).get("address") or {}
+        if data.get("enabled") is False:
+            raise HTTPException(status_code=400, detail="pickup_point_required")
+        return {"id": data["id"], "name": data.get("name") or "", "type": data.get("type") or "", "street": addr.get("street") or "",
+                "zip": addr.get("zip") or "", "city": addr.get("city") or "", "country": (addr.get("country") or "").upper()}
+    except HTTPException:
+        raise
+    except Exception:
+        logger.warning("DPD pickup API unavailable, using the widget's data for %s", point.id)
+        return {**point.model_dump(), "type": "", "country": point.country.upper()}
 
 
 def _site_url(request: Request) -> str:
@@ -306,6 +356,14 @@ def build_router(db, send_email) -> APIRouter:
         summary = _summary(res["cart"])
         if not summary["shipping"] or summary["shipping"]["handle"] != input.delivery_handle:
             raise HTTPException(status_code=400, detail="invalid_delivery")
+        pickup = None
+        if PICKUP_RE.search(summary["shipping"]["title"]):
+            # The rate is priced for the address's country, so the box must be in that country too.
+            if not input.pickup_point:
+                raise HTTPException(status_code=400, detail="pickup_point_required")
+            pickup = await _dpd_point(input.pickup_point)
+            if pickup["country"] not in ("", input.country):
+                raise HTTPException(status_code=400, detail="pickup_point_country")
 
         ref = "W" + secrets.token_hex(8).upper()
         currency = summary["currency"]
@@ -337,6 +395,7 @@ def build_router(db, send_email) -> APIRouter:
             "summary": summary,
             "customer": {"email": input.email, "phone": input.phone, "first_name": input.first_name, "last_name": input.last_name},
             "address": {"address1": input.address1, "address2": input.address2, "city": input.city, "zip": input.zip, "country": input.country},
+            "pickup_point": pickup,
             "shopify_state": None,
         }
         await checkouts.insert_one(doc)
@@ -414,21 +473,27 @@ def build_router(db, send_email) -> APIRouter:
         address = {"firstName": c["first_name"], "lastName": c["last_name"], "address1": a["address1"],
                    "address2": a["address2"] or None, "city": a["city"], "zip": a["zip"],
                    "countryCode": a["country"], "phone": c["phone"]}
+        pp = claimed.get("pickup_point")
+        # Box delivery: ship to the DPD point; its ID goes into company, shipping code and note for the label.
+        shipping_address = {**address, "company": f"DPD Pickup {pp['id']} {pp['name']}"[:255], "address1": pp["street"] or pp["id"],
+                            "address2": None, "city": pp["city"] or a["city"], "zip": pp["zip"] or a["zip"]} if pp else address
+        shipping_code = f"DPD-PICKUP:{pp['id']}" if pp else s["shipping"]["title"]
         order = {
             "currency": cur,
             "email": c["email"],
             "phone": c["phone"],
             "customer": {"toUpsert": {"email": c["email"], "firstName": c["first_name"], "lastName": c["last_name"]}},
             "lineItems": [{"variantId": l["variantId"], "quantity": l["quantity"], "priceSet": money(l["price"])} for l in s["lines"]],
-            "shippingAddress": address,
+            "shippingAddress": shipping_address,
             "billingAddress": address,
-            "shippingLines": [{"title": s["shipping"]["title"], "code": s["shipping"]["title"], "priceSet": money(s["shipping"]["amount"])}],
+            "shippingLines": [{"title": s["shipping"]["title"], "code": shipping_code, "priceSet": money(s["shipping"]["amount"])}],
             "financialStatus": "PAID",
             "transactions": [{"kind": "SALE", "status": "SUCCESS", "gateway": "Teya",
                               "authorizationCode": claimed.get("teya_transaction_id"), "amountSet": money(claimed["total"])}],
             "taxesIncluded": True,
             "sourceIdentifier": claimed["ref"],
-            "note": f"Teya {claimed.get('teya_transaction_id') or ''} · web checkout {claimed['ref']}",
+            "note": f"Teya {claimed.get('teya_transaction_id') or ''} · web checkout {claimed['ref']}"
+                    + (f" · DPD Pickup {pp['id']}: {pp['name']}, {pp['street']}, {pp['zip']} {pp['city']}" if pp else ""),
             "tags": ["teya", "web-checkout"],
         }
         if s["discount"]:
@@ -470,6 +535,10 @@ def build_router(db, send_email) -> APIRouter:
             f"but creating the Shopify order failed: <strong>{escape(error)}</strong>. Create it manually.</p>"
             f"<p><strong>Total:</strong> {doc['total']} {doc['currency']}<br><strong>Shipping:</strong> "
             f"{escape(s['shipping']['title'])} ({s['shipping']['amount']})<br><strong>Discount:</strong> {s['discount']}</p>"
+            + (f"<p><strong>DPD Pickup:</strong> {escape(doc['pickup_point']['id'])} — {escape(doc['pickup_point']['name'])}, "
+               f"{escape(doc['pickup_point']['street'])}, {escape(doc['pickup_point']['zip'])} {escape(doc['pickup_point']['city'])}</p>"
+               if doc.get("pickup_point") else "")
+            +
             f"<ul>{rows}</ul>"
             f"<p>{escape(c['first_name'])} {escape(c['last_name'])}<br>{escape(c['email'])}<br>{escape(c['phone'])}<br>"
             f"{escape(a['address1'])} {escape(a['address2'] or '')}<br>{escape(a['zip'])} {escape(a['city'])}, {escape(a['country'])}</p>"
