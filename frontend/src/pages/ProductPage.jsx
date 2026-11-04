@@ -74,6 +74,13 @@ export default function ProductPage() {
     return all.filter((v, i, a) => v && a.indexOf(v) === i);
   }, [product]);
 
+  // Picking a variant jumps to its photo; after that the thumbnails choose freely.
+  const variantImage = variant?.image;
+  useEffect(() => {
+    const i = variantImage ? images.indexOf(variantImage) : -1;
+    if (i >= 0) setActiveImage(i);
+  }, [variantImage, images]);
+
   if (product === undefined) {
     return (
       <div className="grid min-h-screen pt-16 lg:grid-cols-[1fr_1.4fr_1fr]" data-testid="product-loading">
@@ -104,7 +111,7 @@ export default function ProductPage() {
 
   const price = variant?.price || product.price;
   const compareAt = variant?.compareAtPrice || product.compareAtPrice;
-  const mainImage = variant?.image || images[activeImage] || images[0];
+  const mainImage = images[activeImage] || variant?.image || images[0];
 
   const optionAvailable = (name, value) =>
     product.variants.some(
