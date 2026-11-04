@@ -96,7 +96,7 @@ export const LEGAL_DOCS = {
       },
       {
         "type": "li",
-        "text": "Kupní cenu lze uhradit: online platební kartou a dalšími způsoby přes zabezpečenou platební bránu (Teya / Shopify Payments)."
+        "text": "Kupní cenu lze uhradit: online platební kartou přes zabezpečenou platební bránu Teya."
       },
       {
         "type": "li",

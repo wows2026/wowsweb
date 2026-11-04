@@ -22,6 +22,8 @@ import LookbookPage from "@/pages/LookbookPage";
 import SocialsPage from "@/pages/SocialsPage";
 import ContactPage from "@/pages/ContactPage";
 import LegalPage from "@/pages/LegalPage";
+import CheckoutPage from "@/pages/CheckoutPage";
+import CheckoutReturnPage from "@/pages/CheckoutReturnPage";
 
 function Landing() {
   return (
@@ -104,6 +106,8 @@ export default function App() {
               <Route path="/socials" element={<SocialsPage />} />
               <Route path="/contact" element={<ContactPage />} />
               <Route path="/legal/:slug" element={<LegalPage />} />
+              <Route path="/checkout" element={<CheckoutPage />} />
+              <Route path="/checkout/return" element={<CheckoutReturnPage />} />
               <Route path="*" element={<Landing />} />
             </Routes>
             <Footer />

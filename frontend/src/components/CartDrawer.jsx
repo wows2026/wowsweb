@@ -2,6 +2,7 @@ import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { X, Minus, Plus, ShoppingBag, Lock } from "lucide-react";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/i18n";
 import { useCart, formatPrice } from "@/shop";
 
@@ -9,6 +10,7 @@ export default function CartDrawer() {
   const { t, lang } = useLanguage();
   const { cart, open, setOpen, busy, updateLine, removeLine, applyDiscount } = useCart();
   const [code, setCode] = useState("");
+  const navigate = useNavigate();
 
   const lines = cart?.lines || [];
   const count = cart?.totalQuantity || 0;
@@ -30,7 +32,8 @@ export default function CartDrawer() {
   };
 
   const checkout = () => {
-    if (cart?.checkoutUrl) window.location.href = cart.checkoutUrl;
+    setOpen(false);
+    navigate("/checkout");
   };
 
   return (

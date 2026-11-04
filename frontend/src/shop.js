@@ -29,6 +29,8 @@ export function CartProvider({ children }) {
     axios
       .get(`${API}/cart`, { params: { cart_id: id } })
       .then((r) => {
+        // The checkout return page may have cleared the cart while this request was in flight.
+        if (localStorage.getItem(CART_KEY) !== id) return;
         if (r.data.completedAt) localStorage.removeItem(CART_KEY);
         else setCart(r.data);
       })
@@ -119,8 +121,14 @@ export function CartProvider({ children }) {
     }
   };
 
+  // After a paid order: the Shopify cart is never "completed" by our own checkout, so forget it here.
+  const clearCart = () => {
+    setCart(null);
+    localStorage.removeItem(CART_KEY);
+  };
+
   return (
-    <CartContext.Provider value={{ cart, open, setOpen, busy, currency, setCurrency, addLine, updateLine, removeLine, applyDiscount }}>
+    <CartContext.Provider value={{ cart, open, setOpen, busy, currency, setCurrency, addLine, updateLine, removeLine, applyDiscount, clearCart }}>
       {children}
     </CartContext.Provider>
   );

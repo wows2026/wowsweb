@@ -21,6 +21,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel, field_validator
 
 from shopify_client import storefront_query, admin_query, ShopifyError
+from checkout import build_router as build_checkout_router
 
 mongo_url = os.environ["MONGO_URL"]
 client = AsyncIOMotorClient(mongo_url)
@@ -732,6 +733,7 @@ async def contact_message(input: ContactMessage):
     return {"status": "sent", "email_id": email_id}
 
 
+api_router.include_router(build_checkout_router(db, send_email))
 app.include_router(api_router)
 
 app.add_middleware(
