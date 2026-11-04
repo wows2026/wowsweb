@@ -100,10 +100,6 @@ export const LEGAL_DOCS = {
       },
       {
         "type": "li",
-        "text": "Při platbě převodem předem je cena splatná do 5 dnů od uzavření smlouvy. Nebude-li zaplacena ani do 3 dnů po upozornění e-mailem, můžeme od smlouvy odstoupit."
-      },
-      {
-        "type": "li",
         "text": "Údaje o platebních kartách nezpracováváme; platbu zpracovává poskytovatel platební brány."
       },
       {
@@ -574,7 +570,7 @@ export const LEGAL_DOCS = {
     "content": [
       {
         "type": "p",
-        "text": "Zboží skladem odesíláme do 1–2 pracovních dnů, doprava po ČR je zdarma od 1 500 Kč. Tento dokument je součástí obchodních podmínek e-shopu WINORWINS."
+        "text": "Zboží skladem odesíláme do 1–2 pracovních dnů přes DPD, na adresu nebo do DPD boxu. Tento dokument je součástí obchodních podmínek e-shopu WINORWINS."
       },
       {
         "type": "h2",
@@ -582,11 +578,7 @@ export const LEGAL_DOCS = {
       },
       {
         "type": "li",
-        "text": "Objednávky zaplacené nebo s dobírkou přijaté do 12:00 v pracovní den odesíláme týž den."
-      },
-      {
-        "type": "li",
-        "text": "U platby převodem předem běží lhůta od připsání platby na náš účet."
+        "text": "Objednávky zaplacené do 12:00 v pracovní den odesíláme týž den."
       },
       {
         "type": "li",
@@ -614,44 +606,23 @@ export const LEGAL_DOCS = {
           [
             "Způsob dopravy",
             "Doručení po odeslání",
-            "Cena",
-            "Zdarma od"
+            "Cena"
           ],
           [
-            "Zásilkovna – výdejní místo",
+            "DPD – doručení do boxu nebo na výdejní místo",
             "1–2 pracovní dny",
-            "79 Kč",
-            "1 500 Kč"
+            "79 Kč"
           ],
           [
-            "Zásilkovna – na adresu",
+            "DPD – doručení na adresu",
             "1–2 pracovní dny",
-            "119 Kč",
-            "1 500 Kč"
-          ],
-          [
-            "Balíkovna",
-            "1–2 pracovní dny",
-            "69 Kč",
-            "1 500 Kč"
-          ],
-          [
-            "PPL",
-            "1 pracovní den",
-            "129 Kč",
-            "1 500 Kč"
-          ],
-          [
-            "Osobní odběr – adresa",
-            "po potvrzení e-mailem",
-            "zdarma",
-            "–"
+            "89 Kč"
           ]
         ]
       },
       {
         "type": "p",
-        "text": "Dobírka: příplatek 39 Kč."
+        "text": "DPD box nebo výdejní místo si vyberete na mapě v pokladně. Platba probíhá předem kartou, dobírku nenabízíme."
       },
       {
         "type": "h2",
@@ -668,15 +639,9 @@ export const LEGAL_DOCS = {
           ],
           [
             "Slovensko",
-            "Zásilkovna – výdejní místo",
+            "DPD – box nebo na adresu",
             "2–3 pracovní dny",
-            "99 Kč"
-          ],
-          [
-            "Slovensko",
-            "Kurýr na adresu",
-            "2–3 pracovní dny",
-            "149 Kč"
+            "zobrazí se v pokladně"
           ],
           [
             "Ostatní státy EU",
@@ -716,7 +681,7 @@ export const LEGAL_DOCS = {
       },
       {
         "type": "li",
-        "text": "Zásilka čeká na výdejním místě po dobu uložení podle dopravce (obvykle 7 dní)."
+        "text": "Zásilka čeká v DPD boxu nebo na výdejním místě po dobu uložení podle dopravce (obvykle 7 dní)."
       },
       {
         "type": "li",
@@ -868,7 +833,7 @@ export const LEGAL_DOCS = {
       },
       {
         "type": "li",
-        "text": "dopravci: Zásilkovna, Česká pošta,"
+        "text": "dopravce: DPD (Direct Parcel Distribution CZ s.r.o.),"
       },
       {
         "type": "li",
