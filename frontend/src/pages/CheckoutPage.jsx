@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Link, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Lock, Loader2, MapPin, X } from "lucide-react";
+import { ChevronDown, Lock, Loader2, MapPin, X } from "lucide-react";
 import { toast } from "sonner";
 import axios from "axios";
 import { useLanguage } from "@/i18n";
@@ -10,12 +10,202 @@ import { API, useCart, formatPrice } from "@/shop";
 
 // The Shopify store ships to the EU; country names come from the browser in the page language.
 const COUNTRIES = ["CZ", "SK", "AT", "BE", "BG", "CY", "DE", "DK", "EE", "ES", "FI", "FR", "GR", "HR", "HU", "IE", "IT", "LT", "LU", "LV", "MT", "NL", "PL", "PT", "RO", "SE", "SI"];
+const DIAL_CODES = {
+  CZ: "420", SK: "421", AT: "43", BE: "32", BG: "359", CY: "357", DE: "49", DK: "45", EE: "372", ES: "34", FI: "358", FR: "33", GR: "30", HR: "385",
+  HU: "36", IE: "353", IT: "39", LT: "370", LU: "352", LV: "371", MT: "356", NL: "31", PL: "48", PT: "351", RO: "40", SE: "46", SI: "386",
+  // Not delivery countries, but a buyer can order for someone else from a foreign number.
+  CH: "41", GB: "44", NO: "47", UA: "380", US: "1", VN: "84",
+};
 const FORM_KEY = "wino_checkout_form";
 const DPD_WIDGET = "https://api.dpd.cz/widget/latest/index.html";
 
 const labelCls = "mb-2 block font-mono text-[10px] font-bold tracking-[0.25em] text-zinc-500";
 const inputCls =
   "w-full border-b-2 border-zinc-300 bg-transparent py-3 text-base outline-none transition-colors placeholder-zinc-400 focus:border-black sm:text-sm";
+
+const flag = (code) => String.fromCodePoint(...[...code].map((ch) => 0x1f1a5 + ch.charCodeAt(0)));
+
+const regionNames = (lang, codes) => {
+  const dn = new Intl.DisplayNames([lang === "cz" ? "cs" : "en"], { type: "region" });
+  return codes
+    .map((code) => ({ code, name: dn.of(code) }))
+    .sort((a, b) => (a.code === "CZ" ? -1 : b.code === "CZ" ? 1 : a.code === "SK" ? -1 : b.code === "SK" ? 1 : a.name.localeCompare(b.name)));
+};
+
+// A pasted or autofilled "+420 777…" belongs in the selector, not in the number field.
+function splitPhone(value) {
+  const compact = value.replace(/[^\d+]/g, "").replace(/^00/, "+");
+  if (!compact.startsWith("+")) return null;
+  const code = Object.keys(DIAL_CODES)
+    .filter((c) => compact.startsWith(`+${DIAL_CODES[c]}`))
+    .sort((a, b) => DIAL_CODES[b].length - DIAL_CODES[a].length)[0];
+  return code ? { phone_country: code, phone: compact.slice(DIAL_CODES[code].length + 1) } : null;
+}
+
+function fullPhone({ phone, phone_country: code }) {
+  const digits = phone.replace(/\D/g, "");
+  // The trunk 0 is dropped in international format, except in Italy where it is part of the number.
+  return `+${DIAL_CODES[code]} ${code === "IT" ? digits : digits.replace(/^0+/, "")}`;
+}
+
+function PhoneField({ label, codeLabel, lang, form, setForm }) {
+  const options = useMemo(() => regionNames(lang, Object.keys(DIAL_CODES)), [lang]);
+  return (
+    <div>
+      <label htmlFor="checkout-phone" className={labelCls}>
+        {label}
+      </label>
+      <div className="flex gap-3">
+        <div className="relative shrink-0 border-b-2 border-zinc-300 transition-colors focus-within:border-black">
+          <span className="pointer-events-none flex h-full items-center gap-1.5 pr-1 text-base sm:text-sm" data-testid="checkout-phone-code">
+            {flag(form.phone_country)} +{DIAL_CODES[form.phone_country]}
+            <ChevronDown className="h-3.5 w-3.5 text-zinc-500" />
+          </span>
+          {/* The native picker, invisible over the compact label: full country names when open, a short "+420" when closed. */}
+          <select
+            aria-label={codeLabel}
+            data-testid="checkout-phone-country"
+            autoComplete="tel-country-code"
+            value={form.phone_country}
+            onChange={(e) => setForm((f) => ({ ...f, phone_country: e.target.value }))}
+            className="absolute inset-0 w-full cursor-pointer opacity-0"
+          >
+            {options.map(({ code, name }) => (
+              <option key={code} value={code}>
+                {flag(code)} {name} +{DIAL_CODES[code]}
+              </option>
+            ))}
+          </select>
+        </div>
+        <input
+          id="checkout-phone"
+          data-testid="checkout-phone"
+          className={`${inputCls} min-w-0 flex-1`}
+          type="tel"
+          autoComplete="tel-national"
+          required
+          placeholder="777 123 456"
+          value={form.phone}
+          onChange={(e) => {
+            const value = e.target.value;
+            setForm((f) => ({ ...f, ...(splitPhone(value) || { phone: value }) }));
+          }}
+        />
+      </div>
+    </div>
+  );
+}
+
+// Street field with address suggestions; picking one fills in the street, number, city and postal code.
+function AddressField({ label, placeholder, country, value, onType, onPick }) {
+  const [items, setItems] = useState([]);
+  const [active, setActive] = useState(-1);
+  const timer = useRef(null);
+  const seq = useRef(0);
+  const input = useRef(null);
+
+  const close = () => {
+    clearTimeout(timer.current);
+    seq.current++;
+    setItems([]);
+    setActive(-1);
+  };
+
+  useEffect(() => () => clearTimeout(timer.current), []);
+  useEffect(close, [country]);
+
+  const onChange = (e) => {
+    const q = e.target.value;
+    onType(q);
+    clearTimeout(timer.current);
+    const mine = ++seq.current;
+    if (q.trim().length < 3) {
+      setItems([]);
+      return;
+    }
+    timer.current = setTimeout(async () => {
+      try {
+        const r = await axios.get(`${API}/checkout/address-suggest`, { params: { q, country } });
+        // Browser autofill also fires onChange; don't open a list on a field the buyer isn't in.
+        if (mine !== seq.current || document.activeElement !== input.current) return;
+        setItems(r.data.items);
+        setActive(-1);
+      } catch {
+        if (mine === seq.current) setItems([]);
+      }
+    }, 250);
+  };
+
+  const pick = (item) => {
+    close();
+    onPick(item);
+  };
+
+  const onKeyDown = (e) => {
+    if (!items.length) return;
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+      e.preventDefault();
+      const step = e.key === "ArrowDown" ? 1 : -1;
+      setActive((a) => (a + step + items.length + (a < 0 && step < 0 ? 1 : 0)) % items.length);
+    } else if (e.key === "Enter" && active >= 0) {
+      e.preventDefault();
+      pick(items[active]);
+    } else if (e.key === "Escape") {
+      close();
+    }
+  };
+
+  return (
+    <div className="relative sm:col-span-2">
+      <label htmlFor="checkout-address1" className={labelCls}>
+        {label}
+      </label>
+      <input
+        ref={input}
+        id="checkout-address1"
+        data-testid="checkout-address1"
+        className={inputCls}
+        autoComplete="address-line1"
+        required
+        role="combobox"
+        aria-expanded={items.length > 0}
+        aria-controls="checkout-address-list"
+        aria-autocomplete="list"
+        placeholder={placeholder}
+        value={value}
+        onChange={onChange}
+        onKeyDown={onKeyDown}
+        onBlur={close}
+      />
+      {items.length > 0 && (
+        <ul id="checkout-address-list" role="listbox" className="absolute top-full right-0 left-0 z-30 border-2 border-t-0 border-black bg-white" data-testid="checkout-address-list">
+          {items.map((item, i) => (
+            <li
+              key={`${item.label}-${i}`}
+              role="option"
+              aria-selected={i === active}
+              // Keep focus in the input so its blur doesn't close the list before the click lands.
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => pick(item)}
+              onMouseEnter={() => setActive(i)}
+              className={`flex cursor-pointer items-start gap-2 px-3 py-3 text-sm ${i === active ? "bg-[#FFE600]" : ""}`}
+              data-testid="checkout-address-option"
+            >
+              <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+              <span className="min-w-0">
+                <strong className="block font-semibold">{item.address1}</strong>
+                <span className="block text-xs text-zinc-600">{[item.zip, item.city].filter(Boolean).join(" ")}</span>
+              </span>
+            </li>
+          ))}
+          <li role="presentation" className="px-3 py-1.5 text-right font-mono text-[9px] tracking-[0.15em] text-zinc-400">
+            MAPY.COM
+          </li>
+        </ul>
+      )}
+    </div>
+  );
+}
 
 function Field({ id, label, className = "", ...props }) {
   return (
@@ -34,9 +224,11 @@ export default function CheckoutPage() {
   const { cart, currency } = useCart();
   const [params] = useSearchParams();
   const [form, setForm] = useState(() => {
-    const empty = { email: "", phone: "", first_name: "", last_name: "", address1: "", address2: "", city: "", zip: "", country: currency === "EUR" ? "SK" : "CZ" };
+    const country = currency === "EUR" ? "SK" : "CZ";
+    const empty = { email: "", phone: "", phone_country: country, first_name: "", last_name: "", address1: "", address2: "", city: "", zip: "", country };
     try {
-      return { ...empty, ...JSON.parse(sessionStorage.getItem(FORM_KEY) || "{}") };
+      const stored = { ...empty, ...JSON.parse(sessionStorage.getItem(FORM_KEY) || "{}") };
+      return { ...stored, ...splitPhone(stored.phone) };
     } catch {
       return empty;
     }
@@ -70,12 +262,7 @@ export default function CheckoutPage() {
     if (pickup && pickup.country && pickup.country !== form.country) setPickup(null);
   }, [form.country]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const countryNames = useMemo(() => {
-    const dn = new Intl.DisplayNames([lang === "cz" ? "cs" : "en"], { type: "region" });
-    return COUNTRIES.map((code) => ({ code, name: dn.of(code) })).sort((a, b) =>
-      a.code === "CZ" ? -1 : b.code === "CZ" ? 1 : a.code === "SK" ? -1 : b.code === "SK" ? 1 : a.name.localeCompare(b.name)
-    );
-  }, [lang]);
+  const countryNames = useMemo(() => regionNames(lang, COUNTRIES), [lang]);
 
   useEffect(() => {
     if (params.get("cancelled")) toast(c.cancelled);
@@ -88,6 +275,11 @@ export default function CheckoutPage() {
   }, [form]);
 
   const set = (key) => (e) => setForm((f) => ({ ...f, [key]: e.target.value }));
+  // The phone code follows the delivery country until a number has been typed.
+  const setCountry = (e) => {
+    const country = e.target.value;
+    setForm((f) => ({ ...f, country, phone_country: f.phone.trim() ? f.phone_country : country }));
+  };
 
   // Shipping rates come from Shopify for the typed address; re-quote when the address (or cart) changes.
   const addressReady = form.address1.trim() && form.city.trim() && form.zip.trim() && form.country;
@@ -145,9 +337,11 @@ export default function CheckoutPage() {
     }
     setPaying(true);
     try {
+      const { phone_country, ...address } = form;
       const r = await axios.post(`${API}/checkout/start`, {
         cart_id: cart.id,
-        ...form,
+        ...address,
+        phone: fullPhone(form),
         delivery_handle: delivery,
         pickup_point: selected?.pickup ? pickup : null,
         lang,
@@ -196,7 +390,7 @@ export default function CheckoutPage() {
             <p className="mb-5 font-mono text-xs font-bold tracking-[0.25em]">{c.contact}</p>
             <div className="grid gap-6 sm:grid-cols-2">
               <Field id="checkout-email" label={c.email} type="email" autoComplete="email" required value={form.email} onChange={set("email")} />
-              <Field id="checkout-phone" label={c.phone} type="tel" autoComplete="tel" required placeholder="+420" value={form.phone} onChange={set("phone")} />
+              <PhoneField label={c.phone} codeLabel={c.phoneCode} lang={lang} form={form} setForm={setForm} />
             </div>
           </section>
 
@@ -205,15 +399,11 @@ export default function CheckoutPage() {
             <div className="grid gap-6 sm:grid-cols-2">
               <Field id="checkout-first-name" label={c.firstName} autoComplete="given-name" required value={form.first_name} onChange={set("first_name")} />
               <Field id="checkout-last-name" label={c.lastName} autoComplete="family-name" required value={form.last_name} onChange={set("last_name")} />
-              <Field id="checkout-address1" className="sm:col-span-2" label={c.address1} autoComplete="address-line1" required value={form.address1} onChange={set("address1")} />
-              <Field id="checkout-address2" className="sm:col-span-2" label={c.address2} autoComplete="address-line2" value={form.address2} onChange={set("address2")} />
-              <Field id="checkout-city" label={c.city} autoComplete="address-level2" required value={form.city} onChange={set("city")} />
-              <Field id="checkout-zip" label={c.zip} autoComplete="postal-code" required value={form.zip} onChange={set("zip")} />
               <div className="sm:col-span-2">
                 <label htmlFor="checkout-country" className={labelCls}>
                   {c.country}
                 </label>
-                <select id="checkout-country" data-testid="checkout-country" autoComplete="country" value={form.country} onChange={set("country")} className={`${inputCls} cursor-pointer`}>
+                <select id="checkout-country" data-testid="checkout-country" autoComplete="country" value={form.country} onChange={setCountry} className={`${inputCls} cursor-pointer`}>
                   {countryNames.map(({ code, name }) => (
                     <option key={code} value={code}>
                       {name}
@@ -221,6 +411,17 @@ export default function CheckoutPage() {
                   ))}
                 </select>
               </div>
+              <AddressField
+                label={c.address1}
+                placeholder={c.addressPlaceholder}
+                country={form.country}
+                value={form.address1}
+                onType={(address1) => setForm((f) => ({ ...f, address1 }))}
+                onPick={({ address1, city, zip }) => setForm((f) => ({ ...f, address1, city, zip }))}
+              />
+              <Field id="checkout-address2" className="sm:col-span-2" label={c.address2} autoComplete="address-line2" value={form.address2} onChange={set("address2")} />
+              <Field id="checkout-city" label={c.city} autoComplete="address-level2" required value={form.city} onChange={set("city")} />
+              <Field id="checkout-zip" label={c.zip} autoComplete="postal-code" required value={form.zip} onChange={set("zip")} />
             </div>
           </section>
 

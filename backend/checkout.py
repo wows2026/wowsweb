@@ -10,6 +10,7 @@ import re
 import time
 import secrets
 import logging
+import unicodedata
 from datetime import datetime, timezone
 from decimal import Decimal, ROUND_HALF_UP
 from html import escape
@@ -24,6 +25,8 @@ import teya_client as teya
 from shopify_client import storefront_query, admin_query, ShopifyError
 
 logger = logging.getLogger(__name__)
+# httpx logs every request URL at INFO, and an address search has what the buyer typed in it.
+logging.getLogger("httpx").setLevel(logging.WARNING)
 
 ORDER_ALERT_RECIPIENT = os.environ.get("ORDER_ALERT_EMAIL", "info@winorwins.com")
 PUBLIC_SITE_URL = os.environ.get("PUBLIC_SITE_URL", "").rstrip("/")
@@ -32,6 +35,10 @@ PHONE_RE = re.compile(r"^\+?[0-9 ()-]{6,20}$")
 # Shopify rates named like "DPD – box" / "DPD Pickup" deliver to a point the customer picks on DPD's map.
 PICKUP_RE = re.compile(r"box|pickup|výdejn", re.I)
 DPD_PICKUP_URL = "https://api.dpd.cz/api/v1/pickup-points/{}"
+MAPY_SUGGEST_URL = "https://api.mapy.com/v1/suggest"
+# Result language per delivery country, so city names come out the way the courier expects them.
+CITY_IN_QUERY = re.compile(r"^(.*?\d\S*)[,\s]+(\D{2,})$")
+MAPY_LANG = {"CZ": "cs", "SK": "sk", "DE": "de", "AT": "de", "FR": "fr", "ES": "es", "IT": "it", "NL": "nl", "PL": "pl", "PT": "pt", "GR": "el"}
 
 CHECKOUT_FRAGMENT = """
 fragment CheckoutCart on Cart {
@@ -261,6 +268,63 @@ def _summary(cart: dict) -> dict:
     }
 
 
+def _mapy_address(item: dict, country: str) -> Optional[dict]:
+    """A Mapy.com suggestion as checkout form fields; None when it lies outside the delivery country."""
+    regions = item.get("regionalStructure") or []
+    iso = next((r.get("isoCode") for r in regions if r.get("isoCode")), None)
+    if iso and iso.upper() != country:
+        return None
+    city = next((r.get("name") for r in regions if r.get("type") == "regional.municipality"), "")
+    return {"address1": item.get("name") or "", "city": city or "", "zip": item.get("zip") or "", "label": item.get("location") or item.get("name") or ""}
+
+
+def _fold(text: str) -> str:
+    return "".join(ch for ch in unicodedata.normalize("NFD", text.casefold()) if not unicodedata.combining(ch))
+
+
+def _rank_addresses(addresses: list, query: str) -> list:
+    """Mapy.com matches the street first and may ignore a typed city or number, so best overlap with the query goes on top."""
+    terms = _fold(query).replace(",", " ").split()
+
+    def score(a: dict) -> int:
+        words = set(re.split(r"[\s/,-]+", _fold(f"{a['address1']} {a['zip']} {a['city']}")))
+        # An exact word (house number, city) beats a street name that merely starts with what was typed.
+        return sum(2 if t in words else 1 if any(w.startswith(t) for w in words) else 0 for t in terms)
+
+    unique = {(a["address1"], a["zip"], a["city"]): a for a in reversed(addresses)}
+    return sorted(reversed(list(unique.values())), key=score, reverse=True)[:5]
+
+
+async def _suggest_addresses(query: str, country: str) -> list:
+    """Autocomplete is a convenience: without a key or when Mapy.com fails the buyer just types the address."""
+    key = os.environ.get("MAPY_API_KEY")
+    query = query.strip()
+    if not key or not 3 <= len(query) <= 120 or not re.fullmatch(r"[A-Z]{2}", country):
+        return []
+    # "Husova 12 Plzeň": search the street inside the typed city, or common street names drown it out.
+    typed_city = CITY_IN_QUERY.match(query)
+    searches = [(typed_city[1], typed_city[2])] if typed_city else []
+    searches.append((query, country.lower()))
+    try:
+        async with httpx.AsyncClient(timeout=4) as client:
+            for text, locality in searches:
+                resp = await client.get(
+                    MAPY_SUGGEST_URL,
+                    headers={"X-Mapy-Api-Key": key},
+                    params={"query": text, "type": "regional.address", "locality": locality, "limit": 15, "lang": MAPY_LANG.get(country, "en")},
+                )
+                if resp.status_code != 200:
+                    logger.warning("Mapy.com suggest returned %s", resp.status_code)
+                    return []
+                addresses = [a for a in (_mapy_address(i, country) for i in resp.json().get("items") or []) if a and a["address1"]]
+                if addresses:
+                    return _rank_addresses(addresses, query)
+        return []
+    except (httpx.HTTPError, ValueError) as e:
+        logger.warning("Mapy.com suggest failed: %s", type(e).__name__)
+        return []
+
+
 async def _dpd_point(point: "PickupPoint") -> dict:
     """The point's address straight from DPD's public pickup API; the browser only supplies the ID."""
     try:
@@ -324,6 +388,10 @@ def build_router(db, send_email) -> APIRouter:
                 raise HTTPException(status_code=404, detail="cart_not_found")
             raise HTTPException(status_code=400, detail="invalid_address")
         return res["cart"]
+
+    @router.get("/address-suggest")
+    async def address_suggest(q: str = "", country: str = ""):
+        return {"items": await _suggest_addresses(q, country.strip().upper())}
 
     @router.post("/shipping")
     async def shipping_options(input: CheckoutAddress):
