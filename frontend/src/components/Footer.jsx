@@ -14,7 +14,7 @@ export default function Footer() {
       items: [
         { label: lang === "cz" ? "Obchodní podmínky" : "Terms & Conditions", to: "/legal/terms" },
         { label: lang === "cz" ? "Ochrana osobních údajů" : "Privacy Policy", to: "/legal/privacy" },
-        { label: lang === "cz" ? "Nastavení cookies" : "Cookie Settings", to: "/legal/cookies" },
+        { label: "Cookies", to: "/legal/cookies" },
       ],
     },
     {

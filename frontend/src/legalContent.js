@@ -4,7 +4,7 @@ export const LEGAL_DOCS = {
     "content": [
       {
         "type": "p",
-        "text": "Internetový obchod WINORWINS na adrese winorwins.com. Účinné od 03. 10. 2026."
+        "text": "Internetový obchod WINORWINS na adrese winorwins.com. Účinné od 06. 11. 2026."
       },
       {
         "type": "h2",
@@ -72,7 +72,7 @@ export const LEGAL_DOCS = {
       },
       {
         "type": "li",
-        "text": "Odeslání objednávky potvrdíme automatickým e-mailem o jejím přijetí. Kupní smlouva je uzavřena okamžikem doručení e-mailu „Potvrzení objednávky”, kterým objednávku přijímáme. Jeho přílohou jsou tyto podmínky v PDF."
+        "text": "Po zaplacení vám pošleme e-mail „Potvrzení objednávky”, kterým objednávku přijímáme. Kupní smlouva je uzavřena okamžikem jeho doručení. Aktuální znění těchto podmínek si můžete kdykoli zobrazit a uložit na winorwins.com/legal/terms."
       },
       {
         "type": "li",
@@ -85,10 +85,6 @@ export const LEGAL_DOCS = {
       {
         "type": "li",
         "text": "Při pochybnostech o pravosti objednávky nebo při nedostupnosti zboží můžeme kupujícího před přijetím objednávky kontaktovat a požádat o potvrzení nebo objednávku nepřijmout."
-      },
-      {
-        "type": "li",
-        "text": "Zákaznický účet je dobrovolný. Kupující je povinen chránit své přihlašovací údaje. Účet lze kdykoli zrušit e-mailem na info@winorwins.com nebo v nastavení účtu."
       },
       {
         "type": "h2",
@@ -224,7 +220,7 @@ export const LEGAL_DOCS = {
       },
       {
         "type": "li",
-        "text": "Používání cookies upravuje dokument Zásady používání cookies. Souhlas s nepovinnými cookies lze kdykoli změnit odkazem „Nastavení cookies” v patičce webu."
+        "text": "Používání cookies upravuje dokument Zásady používání cookies."
       },
       {
         "type": "li",
@@ -292,7 +288,7 @@ export const LEGAL_DOCS = {
       },
       {
         "type": "li",
-        "text": "Tyto podmínky nabývají účinnosti dnem 03. 10. 2026."
+        "text": "Tyto podmínky nabývají účinnosti dnem 06. 11. 2026."
       },
       {
         "type": "h2",
@@ -561,7 +557,7 @@ export const LEGAL_DOCS = {
       },
       {
         "type": "p",
-        "text": "Tento reklamační řád je účinný od 03. 10. 2026."
+        "text": "Tento reklamační řád je účinný od 06. 11. 2026."
       }
     ]
   },
@@ -644,16 +640,16 @@ export const LEGAL_DOCS = {
             "zobrazí se v pokladně"
           ],
           [
-            "Ostatní státy EU",
-            "Kurýr",
+            "Ostatní státy EU (kromě Kypru a Malty)",
+            "DPD – na adresu",
             "3–7 pracovních dnů",
-            "podle země, zobrazí se v košíku"
+            "podle země, zobrazí se v pokladně"
           ]
         ]
       },
       {
         "type": "p",
-        "text": "Mimo EU nedoručujeme."
+        "text": "Mimo EU, na Kypr a na Maltu nedoručujeme."
       },
       {
         "type": "p",
@@ -713,7 +709,7 @@ export const LEGAL_DOCS = {
       },
       {
         "type": "p",
-        "text": "Účinné od 03. 10. 2026."
+        "text": "Účinné od 06. 11. 2026."
       }
     ]
   },
@@ -762,12 +758,6 @@ export const LEGAL_DOCS = {
             "10 let podle daňových a účetních předpisů"
           ],
           [
-            "Zákaznický účet",
-            "přihlašovací údaje, historie objednávek, uložené adresy",
-            "plnění smlouvy (čl. 6 odst. 1 písm. b) GDPR)",
-            "do zrušení účtu"
-          ],
-          [
             "Obchodní sdělení stávajícím zákazníkům (obdobné zboží)",
             "e-mail, jméno, historie nákupů",
             "oprávněný zájem (čl. 6 odst. 1 písm. f) GDPR) a § 7 odst. 3 zákona č. 480/2004 Sb.",
@@ -778,18 +768,6 @@ export const LEGAL_DOCS = {
             "e-mail, jméno",
             "souhlas (čl. 6 odst. 1 písm. a) GDPR)",
             "do odvolání souhlasu"
-          ],
-          [
-            "Dotazník spokojenosti a recenze Heureka Ověřeno zákazníky",
-            "e-mail, obsah objednávky",
-            "oprávněný zájem (čl. 6 odst. 1 písm. f) GDPR); lze odmítnout při objednávce",
-            "do odeslání dotazníku"
-          ],
-          [
-            "Analytika a remarketing (cookies)",
-            "online identifikátory, chování na webu",
-            "souhlas (čl. 6 odst. 1 písm. a) GDPR)",
-            "viz Zásady používání cookies"
           ],
           [
             "Zákaznická podpora a komunikace (e-mail, chat, sociální sítě)",
@@ -825,7 +803,11 @@ export const LEGAL_DOCS = {
       },
       {
         "type": "li",
-        "text": "provozovatel e-shopové platformy a hostingu: Shopify,"
+        "text": "provozovatel e-shopové platformy: Shopify,"
+      },
+      {
+        "type": "li",
+        "text": "hosting webu: Emergent,"
       },
       {
         "type": "li",
@@ -841,19 +823,11 @@ export const LEGAL_DOCS = {
       },
       {
         "type": "li",
-        "text": "účetní a daňoví poradci: název účetní firmy,"
+        "text": "účetní a daňoví poradci,"
       },
       {
         "type": "li",
         "text": "nástroj pro rozesílání e-mailů: Ecomail,"
-      },
-      {
-        "type": "li",
-        "text": "analytické a reklamní služby (jen se souhlasem): Google, Meta, TikTok,"
-      },
-      {
-        "type": "li",
-        "text": "služby pro recenze: Heureka,"
       },
       {
         "type": "li",
@@ -869,7 +843,7 @@ export const LEGAL_DOCS = {
       },
       {
         "type": "p",
-        "text": "Někteří naši dodavatelé (Google, Meta, Klaviyo, Shopify) mohou údaje zpracovávat v USA. Předání probíhá na základě rozhodnutí Evropské komise o odpovídající ochraně (EU–US Data Privacy Framework) nebo standardních smluvních doložek."
+        "text": "Někteří naši dodavatelé (Shopify, Emergent) mohou údaje zpracovávat mimo EU. Předání probíhá na základě rozhodnutí Evropské komise o odpovídající ochraně (např. EU–US Data Privacy Framework) nebo standardních smluvních doložek."
       },
       {
         "type": "h2",
@@ -877,7 +851,7 @@ export const LEGAL_DOCS = {
       },
       {
         "type": "p",
-        "text": "Neprovádíme automatizované rozhodování s právními účinky. Personalizovanou reklamu na základě vašeho chování na webu zobrazujeme jen s vaším souhlasem s marketingovými cookies."
+        "text": "Neprovádíme automatizované rozhodování s právními účinky ani profilování. Personalizovanou reklamu na základě vašeho chování na webu nezobrazujeme."
       },
       {
         "type": "h2",
@@ -937,7 +911,7 @@ export const LEGAL_DOCS = {
       },
       {
         "type": "p",
-        "text": "E-shop není určen osobám mladším 15 let. Souhlas s newsletterem a cookies za osobu mladší 15 let musí udělit její zákonný zástupce."
+        "text": "E-shop není určen osobám mladším 15 let. Souhlas s newsletterem za osobu mladší 15 let musí udělit její zákonný zástupce."
       },
       {
         "type": "h2",
@@ -945,11 +919,11 @@ export const LEGAL_DOCS = {
       },
       {
         "type": "p",
-        "text": "Zásady můžeme aktualizovat. Aktuální znění je vždy na www.vaseznacka.cz/ochrana-osobnich-udaju; o podstatných změnách vás informujeme e-mailem."
+        "text": "Zásady můžeme aktualizovat. Aktuální znění je vždy na winorwins.com/legal/privacy; o podstatných změnách vás informujeme e-mailem."
       },
       {
         "type": "p",
-        "text": "Účinné od 03. 10. 2026."
+        "text": "Účinné od 06. 11. 2026."
       }
     ]
   },
@@ -958,105 +932,35 @@ export const LEGAL_DOCS = {
     "content": [
       {
         "type": "p",
-        "text": "Bez souhlasu smíte na web ukládat jen nezbytné cookies; analytické a marketingové až po aktivním souhlasu (opt-in). Níže jsou hotové texty pro cookie lištu, panel nastavení a stránku Zásady používání cookies."
+        "text": "Na winorwins.com nepoužíváme analytické ani marketingové cookies a neměříme, co na webu děláte. Ukládáme jen to, co e-shop potřebuje k provozu, proto po vás souhlas nežádáme."
       },
       {
         "type": "h2",
-        "text": "A) Text cookie lišty"
-      },
-      {
-        "type": "p",
-        "text": "Nadpis: Cookies na WINORWINS"
-      },
-      {
-        "type": "p",
-        "text": "Text: Používáme nezbytné cookies, aby e-shop fungoval. Se vaším souhlasem použijeme i analytické cookies, abychom věděli, co vás zajímá, a marketingové cookies, abychom vám mohli ukazovat relevantní reklamu na sociálních sítích a Googlu. Souhlas můžete kdykoli změnit v patičce webu v odkazu Nastavení cookies. Více v Zásadách používání cookies."
-      },
-      {
-        "type": "p",
-        "text": "Tlačítka (stejně velká a stejně výrazná): Přijmout vše · Odmítnout vše · Nastavení"
-      },
-      {
-        "type": "h2",
-        "text": "B) Panel „Nastavení cookies”"
-      },
-      {
-        "type": "p",
-        "text": "Úvodní text: Vyberte, které cookies můžeme používat. Nezbytné cookies nelze vypnout, bez nich by e-shop nefungoval."
-      },
-      {
-        "type": "table",
-        "rows": [
-          [
-            "Kategorie",
-            "Popis v panelu",
-            "Výchozí stav"
-          ],
-          [
-            "Nezbytné",
-            "Zajišťují základní funkce: košík, přihlášení, dokončení objednávky, zabezpečení a uložení vaší volby cookies.",
-            "vždy zapnuto"
-          ],
-          [
-            "Preferenční",
-            "Pamatují si vaše volby, např. měnu, jazyk nebo naposledy prohlížené zboží.",
-            "vypnuto"
-          ],
-          [
-            "Analytické",
-            "Pomáhají nám pochopit, jak web používáte, abychom ho mohli zlepšovat. Údaje vyhodnocujeme souhrnně.",
-            "vypnuto"
-          ],
-          [
-            "Marketingové",
-            "Umožňují zobrazovat vám relevantní reklamu na Instagramu, Facebooku, TikToku a v síti Google a měřit její úspěšnost.",
-            "vypnuto"
-          ]
-        ]
-      },
-      {
-        "type": "p",
-        "text": "Tlačítka: Uložit nastavení · Přijmout vše · Odmítnout vše"
-      },
-      {
-        "type": "p",
-        "text": "Odkaz v patičce webu (trvale): Nastavení cookies"
-      },
-      {
-        "type": "h2",
-        "text": "C) Zásady používání cookies"
-      },
-      {
-        "type": "h3",
         "text": "Co jsou cookies"
       },
       {
         "type": "p",
-        "text": "Cookies jsou malé textové soubory, které web ukládá do vašeho prohlížeče. Pomáhají, aby web fungoval, pamatoval si vaše volby a abychom mohli měřit návštěvnost a reklamu. Podobně fungují také pixely a jiné měřicí kódy; i na ně se tyto zásady vztahují."
+        "text": "Cookies jsou malé textové soubory, které web ukládá do vašeho prohlížeče. Podobně funguje místní úložiště prohlížeče (localStorage a sessionStorage); i na něj se tyto zásady vztahují."
       },
       {
-        "type": "h3",
-        "text": "Kdo cookies používá"
+        "type": "h2",
+        "text": "Kdo za ně odpovídá"
       },
       {
         "type": "p",
-        "text": "Správcem je Dang Manh Nguyen, IČO 23161850, Chudenická 1059/30, Hostivař, 102 00 Praha 10, kontakt info@winorwins.com. Některé cookies ukládají třetí strany (Google, Meta, TikTok), které s nimi nakládají také podle svých zásad."
+        "text": "Dang Manh Nguyen, IČO 23161850, Chudenická 1059/30, Hostivař, 102 00 Praha 10, kontakt info@winorwins.com."
       },
       {
-        "type": "h3",
+        "type": "h2",
         "text": "Právní základ"
       },
       {
         "type": "p",
-        "text": "Nezbytné cookies používáme bez souhlasu podle § 89 odst. 3 zákona č. 127/2005 Sb., o elektronických komunikacích, protože bez nich nelze poskytnout službu, kterou jste si vyžádali. Ostatní cookies používáme jen s vaším souhlasem (čl. 6 odst. 1 písm. a) GDPR). Na měřicí služby Google používáme Google Consent Mode v2: bez vašeho souhlasu se analytické a reklamní cookies neukládají."
+        "text": "Tyto technické údaje používáme bez souhlasu podle § 89 odst. 3 zákona č. 127/2005 Sb., o elektronických komunikacích, protože bez nich nelze poskytnout službu, kterou jste si vyžádali."
       },
       {
-        "type": "h3",
-        "text": "Přehled cookies"
-      },
-      {
-        "type": "p",
-        "text": "Tabulku upravte podle nástrojů, které na webu skutečně běží. Přesný seznam získáte skenerem cookies nebo z nástroje pro cookie lištu."
+        "type": "h2",
+        "text": "Přehled"
       },
       {
         "type": "table",
@@ -1064,87 +968,73 @@ export const LEGAL_DOCS = {
           [
             "Název",
             "Poskytovatel",
-            "Kategorie",
+            "Typ",
             "Účel",
             "Platnost"
           ],
           [
-            "cc_cookie",
+            "wino_cart_id",
             "WINORWINS",
-            "Nezbytné",
-            "uložení vaší volby cookies",
-            "6 měsíců"
+            "místní úložiště",
+            "obsah košíku",
+            "do smazání nebo dokončení objednávky"
           ],
           [
-            "PHPSESSID",
+            "wino_currency",
             "WINORWINS",
-            "Nezbytné",
-            "relace, košík, přihlášení",
-            "do zavření prohlížeče"
+            "místní úložiště",
+            "zvolená měna",
+            "do smazání"
           ],
           [
-            "cart",
+            "wino_unlocked",
             "WINORWINS",
-            "Nezbytné / Preferenční",
-            "obsah košíku, zvolená měna",
-            "30 dní"
+            "místní úložiště",
+            "přístup na web po zadání hesla",
+            "do smazání"
           ],
           [
-            "_ga, gaID",
-            "Google Analytics 4",
-            "Analytické",
-            "rozlišení návštěvníků, statistiky",
-            "2 roky"
+            "wino_checkout_form",
+            "WINORWINS",
+            "úložiště relace",
+            "rozepsané údaje v pokladně",
+            "do zavření karty nebo dokončení objednávky"
           ],
           [
-            "_gcl_au",
-            "Google Ads",
-            "Marketingové",
-            "měření konverzí z reklam",
-            "3 měsíce"
+            "__emg_sid",
+            "Emergent (hosting)",
+            "cookie",
+            "technický provoz hostingu",
+            "30 minut"
           ],
           [
-            "_fbp",
-            "Meta (Facebook, Instagram)",
-            "Marketingové",
-            "zobrazování a měření reklam",
-            "3 měsíce"
-          ],
-          [
-            "_ttp",
-            "TikTok",
-            "Marketingové",
-            "zobrazování a měření reklam",
-            "13 měsíců"
-          ],
-          [
-            "další, např. Hotjar, Klaviyo",
-            "poskytovatel",
-            "kategorie",
-            "účel",
-            "platnost"
+            "__emg_vid",
+            "Emergent (hosting)",
+            "cookie",
+            "technický provoz hostingu",
+            "1 rok"
           ]
         ]
       },
       {
-        "type": "h3",
-        "text": "Jak dlouho platí souhlas a jak ho změnit"
+        "type": "h2",
+        "text": "Služby třetích stran"
       },
       {
         "type": "p",
-        "text": "Vaši volbu si pamatujeme 6 měsíců; poté se vás zeptáme znovu. Souhlas můžete kdykoli změnit nebo odvolat odkazem Nastavení cookies v patičce webu. Cookies můžete také smazat nebo zablokovat v nastavení prohlížeče; některé funkce e-shopu pak nemusí fungovat."
+        "text": "Web načítá písma ze služeb Google Fonts a cdnfonts, které tak vidí vaši IP adresu. Vyberete-li doručení do boxu, otevře se mapa DPD; platba kartou probíhá na stránce Teya. Tyto služby mohou používat vlastní cookies podle svých zásad."
       },
       {
-        "type": "h3",
-        "text": "Předání mimo EU a vaše práva"
-      },
-      {
-        "type": "p",
-        "text": "Google, Meta a TikTok mohou údaje zpracovávat i mimo EU. Informace o předání a o vašich právech najdete v Zásadách ochrany osobních údajů."
+        "type": "h2",
+        "text": "Jak cookies smazat"
       },
       {
         "type": "p",
-        "text": "Účinné od 03. 10. 2026."
+        "text": "Cookies a data webu můžete kdykoli smazat nebo zablokovat v nastavení prohlížeče. Košík a rozepsaná objednávka se tím vymažou."
+      },
+      {
+        "type": "p",
+        "text": "Účinné od 06. 11. 2026."
       }
     ]
   }

@@ -1,3 +1,4 @@
+# Don't re-run on the old pravni.docx: since 2026-11 frontend/src/legalContent.js is edited directly and is the current text.
 import json
 import re
 from docx import Document

@@ -8,8 +8,8 @@ import axios from "axios";
 import { useLanguage } from "@/i18n";
 import { API, useCart, formatPrice } from "@/shop";
 
-// The Shopify store ships to the EU; country names come from the browser in the page language.
-const COUNTRIES = ["CZ", "SK", "AT", "BE", "BG", "CY", "DE", "DK", "EE", "ES", "FI", "FR", "GR", "HR", "HU", "IE", "IT", "LT", "LU", "LV", "MT", "NL", "PL", "PT", "RO", "SE", "SI"];
+// The Shopify store ships to the EU except Cyprus and Malta; country names come from the browser in the page language.
+const COUNTRIES = ["CZ", "SK", "AT", "BE", "BG", "DE", "DK", "EE", "ES", "FI", "FR", "GR", "HR", "HU", "IE", "IT", "LT", "LU", "LV", "NL", "PL", "PT", "RO", "SE", "SI"];
 const DIAL_CODES = {
   CZ: "420", SK: "421", AT: "43", BE: "32", BG: "359", CY: "357", DE: "49", DK: "45", EE: "372", ES: "34", FI: "358", FR: "33", GR: "30", HR: "385",
   HU: "36", IE: "353", IT: "39", LT: "370", LU: "352", LV: "371", MT: "356", NL: "31", PL: "48", PT: "351", RO: "40", SE: "46", SI: "386",
@@ -491,7 +491,7 @@ export default function CheckoutPage() {
               whileTap={{ scale: 0.98 }}
               disabled={paying || quoting || !selected}
               data-testid="checkout-pay-button"
-              className="flex w-full items-center justify-center gap-3 bg-[#0D0D0D] py-5 font-mono text-xs font-bold tracking-[0.25em] text-white transition-colors duration-300 hover:bg-[#FFE600] hover:text-black disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-[#0D0D0D] disabled:hover:text-white"
+              className="flex w-full items-center justify-center gap-3 bg-[#0D0D0D] px-4 py-5 font-mono text-xs leading-relaxed font-bold tracking-[0.25em] text-white transition-colors duration-300 hover:bg-[#FFE600] hover:text-black disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-[#0D0D0D] disabled:hover:text-white"
             >
               {paying ? c.paying : selected?.pickup && !pickup ? c.boxChoose : `${c.pay} ${money(total)}`}
               <Lock className="h-3.5 w-3.5" />
