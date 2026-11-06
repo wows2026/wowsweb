@@ -837,6 +837,10 @@ export const LEGAL_DOCS = {
       },
       {
         "type": "li",
+        "text": "služba pro našeptávání adres v pokladně: Mapy.com (Seznam.cz, a.s.), předáváme jí jen text adresy, který píšete do pole,"
+      },
+      {
+        "type": "li",
         "text": "účetní a daňoví poradci: název účetní firmy,"
       },
       {
