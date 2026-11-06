@@ -46,6 +46,7 @@ fragment CheckoutCart on Cart {
   totalQuantity
   cost { totalAmount { amount currencyCode } }
   discountCodes { code applicable }
+  discountAllocations { targetType discountedAmount { amount } }
   lines(first: 50) {
     edges {
       node {
@@ -243,15 +244,21 @@ def _summary(cart: dict) -> dict:
         })
     group = (cart.get("deliveryGroups") or {}).get("nodes") or []
     group = group[0] if group else None
+    selected = (group or {}).get("selectedDeliveryOption")
+    shipping = _dec(selected["estimatedCost"]["amount"]) if selected else Decimal("0")
+    # A shipping discount ("free shipping") is an allocation on the shipping line, not part of the rate's price,
+    # and it is only allocated to the selected rate; the same share applies to the other rates.
+    shipping_off = sum((_dec(a["discountedAmount"]["amount"]) for a in cart.get("discountAllocations") or [] if a.get("targetType") == "SHIPPING_LINE"), Decimal("0"))
+    shipping_off = min(shipping_off, shipping)
+    paid_share = (shipping - shipping_off) / shipping if shipping else Decimal("1")
     options = [
-        {"handle": o["handle"], "title": o["title"], "amount": float(_dec(o["estimatedCost"]["amount"])),
+        {"handle": o["handle"], "title": o["title"], "amount": float(_dec(_dec(o["estimatedCost"]["amount"]) * paid_share)),
          "pickup": bool(PICKUP_RE.search(o["title"]))}
         for o in (group or {}).get("deliveryOptions") or []
     ]
-    selected = (group or {}).get("selectedDeliveryOption")
-    shipping = _dec(selected["estimatedCost"]["amount"]) if selected else Decimal("0")
+    shipping -= shipping_off
     total = _dec(cart["cost"]["totalAmount"]["amount"])
-    # totalAmount already includes the selected shipping and every discount, so the rest is the discount.
+    # totalAmount already includes the selected shipping and every discount, so the rest is the discount on the goods.
     discount = items_total + shipping - total
     if discount < Decimal("0.01"):
         discount = Decimal("0")
