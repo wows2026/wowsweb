@@ -1,16 +1,16 @@
 import { createContext, useContext, useState } from "react";
 
 export const LOOKBOOK_IMAGES = [
-  "https://images.unsplash.com/photo-1779675787758-ab13c8e3576d?auto=format&fit=crop&q=85",
-  "https://images.unsplash.com/photo-1779675787607-e31e4926f267?auto=format&fit=crop&q=85",
-  "https://images.unsplash.com/photo-1769458711041-554e51a58cb1?auto=format&fit=crop&q=85",
+  "/community/community-1.jpg",
+  "/community/community-2.jpg",
+  "/community/community-3.jpg",
 ];
 
 export const translations = {
   en: {
     nav: {
       home: "HOME",
-      collection: "SHOP",
+      collection: "DROP 001",
       contact: "CONTACT",
     },
     hero: {
@@ -21,7 +21,7 @@ export const translations = {
       scroll: "SCROLL",
     },
     products: {
-      title: "BUILT FOR THE RELENTLESS",
+      title: "ORIGIN STORY",
       collectionTitle: "FULL COLLECTION",
       viewAll: "FULL COLLECTION",
       comingSoon: "Full collection drops soon. Join the club to get notified.",
@@ -35,6 +35,7 @@ export const translations = {
       addToCart: "ADD TO CART",
       notFound: "PRODUCT NOT FOUND",
       notFoundSub: "This piece is gone or never existed.",
+      similar: "SIMILAR THINGS WE THINK YOU'D LIKE",
     },
     contact: {
       title: "CONTACT",
@@ -48,13 +49,11 @@ export const translations = {
       error: "Something went wrong. Try again.",
     },
     lookbook: {
-      title: "THE ARCHITECTURE OF WINNING",
-      text: "Shot on concrete. Built for movement. Every stitch is a decision to go forward.",
+      title: "COMMUNITY",
     },
     social: {
       title: "OUR SOCIALS",
-      sub: "Video reels from our ambassadors are coming soon. Tag #WINORWINS to get featured.",
-      comingSoon: "VIDEO SOON",
+      sub: "Tag #WINORWINS to get featured.",
       channels: [
         { platform: "INSTAGRAM", handle: "@winorwins.co", link: "https://instagram.com/winorwins.co" },
         { platform: "TIKTOK", handle: "@winorwins.co", link: "https://tiktok.com/@winorwins.co" },
@@ -83,6 +82,15 @@ export const translations = {
       email: "E-mail",
       phone: "Phone",
       phoneCode: "Country code",
+      quest: "QUEST",
+      nextQuest: "NEXT QUEST",
+      back: "BACK",
+      timer: "QUEST TIME",
+      timerNote: "Limited stock. Nothing is reserved until you pay.",
+      timerOver: "TIME'S UP",
+      timerOverNote: "Your pieces still aren't reserved. Finish while they last.",
+      upsell: "ADD TO YOUR DROP",
+      upsellAdd: "ADD",
       addressPlaceholder: "Street, number, city",
       addressNone: "No match in the selected country. Check the country or fill in the address yourself.",
       delivery: "DELIVERY ADDRESS",
@@ -150,7 +158,7 @@ export const translations = {
     },
     newsletter: {
       title: "JOIN THE WINNERS CLUB",
-      sub: "First access to DROP 002, private sales and members-only colorways.",
+      sub: "First access to new drops, restocks and members-only offers. No spam, just wins.",
       placeholder: "your@email.com",
       button: "JOIN NOW",
       loading: "JOINING...",
@@ -159,9 +167,8 @@ export const translations = {
       error: "Something went wrong. Try again.",
     },
     footer: {
-      headings: { legal: "LEGAL", care: "CUSTOMER CARE", socials: "SOCIALS" },
+      headings: { legal: "LEGAL", socials: "SOCIALS" },
       legal: ["Terms & Conditions", "Privacy Policy", "Cookies"],
-      care: ["Shipping Policy", "Refund Policy", "Size Guide", "Contact Us"],
       email: "info@winorwins.com",
       copyright: "© 2026 WINORWINS CLOTHING CO. ALL RIGHTS RESERVED.",
       made: "DESIGNED IN PRAGUE",
@@ -170,7 +177,7 @@ export const translations = {
   cz: {
     nav: {
       home: "HOME",
-      collection: "SHOP",
+      collection: "DROP 001",
       contact: "KONTAKT",
     },
     hero: {
@@ -181,7 +188,7 @@ export const translations = {
       scroll: "SCROLLUJ",
     },
     products: {
-      title: "BUILT FOR THE RELENTLESS",
+      title: "ORIGIN STORY",
       collectionTitle: "CELÁ KOLEKCE",
       viewAll: "CELÁ KOLEKCE",
       comingSoon: "Celá kolekce vychází brzy. Připoj se do klubu a dozvíš se to první.",
@@ -195,6 +202,7 @@ export const translations = {
       addToCart: "PŘIDAT DO KOŠÍKU",
       notFound: "PRODUKT NENALEZEN",
       notFoundSub: "Tenhle kus je pryč, nebo nikdy neexistoval.",
+      similar: "PODOBNÉ VĚCI, KTERÉ BY SE TI MOHLY LÍBIT",
     },
     contact: {
       title: "KONTAKT",
@@ -208,13 +216,11 @@ export const translations = {
       error: "Něco se pokazilo. Zkus to znovu.",
     },
     lookbook: {
-      title: "ARCHITEKTURA VÍTĚZSTVÍ",
-      text: "Foceno na betonu. Stavěno do pohybu. Každý steh je rozhodnutí jít dopředu.",
+      title: "COMMUNITY",
     },
     social: {
       title: "NAŠE SOCIÁLNÍ SÍTĚ",
-      sub: "Videa od našich ambasadorů vychází brzy. Označ #WINORWINS a buď featured.",
-      comingSoon: "VIDEO BRZY",
+      sub: "Označ #WINORWINS a buď featured.",
       channels: [
         { platform: "INSTAGRAM", handle: "@winorwins.co", link: "https://instagram.com/winorwins.co" },
         { platform: "TIKTOK", handle: "@winorwins.co", link: "https://tiktok.com/@winorwins.co" },
@@ -243,6 +249,15 @@ export const translations = {
       email: "E-mail",
       phone: "Telefon",
       phoneCode: "Předvolba",
+      quest: "QUEST",
+      nextQuest: "DALŠÍ QUEST",
+      back: "ZPĚT",
+      timer: "ČAS NA QUEST",
+      timerNote: "Limitované množství. Nic není rezervované, dokud nezaplatíš.",
+      timerOver: "ČAS VYPRŠEL",
+      timerOverNote: "Tvoje kousky pořád nejsou rezervované. Dokonči to, dokud jsou skladem.",
+      upsell: "PŘIDEJ SI K DROPU",
+      upsellAdd: "PŘIDAT",
       addressPlaceholder: "Ulice, číslo, město",
       addressNone: "Ve vybrané zemi jsme adresu nenašli. Zkontroluj zemi, nebo adresu vyplň ručně.",
       delivery: "DORUČOVACÍ ADRESA",
@@ -310,7 +325,7 @@ export const translations = {
     },
     newsletter: {
       title: "PŘIPOJ SE DO WINNERS CLUBU",
-      sub: "Přednostní přístup k DROP 002, privátní slevy a members-only colorwaye.",
+      sub: "První přístup k novým dropům, restockům a nabídkám jen pro členy. Žádný spam, jen výhry.",
       placeholder: "tvuj@email.cz",
       button: "PŘIPOJIT SE",
       loading: "PŘIPOJUJI...",
@@ -319,9 +334,8 @@ export const translations = {
       error: "Něco se pokazilo. Zkus to znovu.",
     },
     footer: {
-      headings: { legal: "PRÁVNÍ", care: "ZÁKAZNICKÁ PÉČE", socials: "SOCIÁLNÍ SÍTĚ" },
+      headings: { legal: "PRÁVNÍ", socials: "SOCIÁLNÍ SÍTĚ" },
       legal: ["Obchodní podmínky", "Ochrana osobních údajů", "Cookies"],
-      care: ["Podmínky dopravy", "Vrácení zboží", "Tabulka velikostí", "Kontakt"],
       email: "info@winorwins.com",
       copyright: "© 2026 WINORWINS CLOTHING CO. VŠECHNA PRÁVA VYHRAZENA.",
       made: "NAVRŽENO V PRAZE",

@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Making of Origin Story – WINORWINS</title>
+<style>
+  :root { --accent: #FEDD00; --ink: #111110; --paper: #E9E8E4; }
+  body { margin: 0; background: var(--paper); }
+  .os { background: var(--paper); color: var(--ink); font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; padding: 88px 24px; box-sizing: border-box; }
+  .os *, .os *::before, .os *::after { box-sizing: border-box; }
+  .os-wrap { max-width: 1280px; margin: 0 auto; display: flex; flex-direction: column; gap: 48px; }
+  .os-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 24px; border-bottom: 2px solid var(--ink); padding-bottom: 24px; }
+  .os-kicker { margin: 0 0 12px; font-size: 13px; font-weight: 500; letter-spacing: .08em; color: #5C5B57; }
+  .os-title { margin: 0; font-weight: 700; font-size: clamp(48px, 7vw, 96px); line-height: .9; letter-spacing: -.03em; text-transform: uppercase; }
+  .os-sub { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; text-align: right; }
+  .os-sub p { margin: 0; }
+  .os-sub .lead { font-size: 20px; font-weight: 600; }
+  .os-sub .hint { font-size: 16px; color: #3B3A37; }
+  .os-steps { display: flex; flex-wrap: wrap; gap: 8px; min-height: 560px; }
+  .os-tab { flex: 1 1 72px; min-width: 64px; min-height: 120px; background: #DAD9D4; color: var(--ink); border: 1px solid #C4C3BD; border-radius: 6px; cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; align-items: center; padding: 20px 8px; font-family: inherit; }
+  .os-tab:hover { background: #D0CFCA; }
+  .os-tab .n { font-size: 13px; color: #5C5B57; }
+  .os-tab .l { writing-mode: vertical-rl; transform: rotate(180deg); font-weight: 700; font-size: 20px; letter-spacing: .02em; text-transform: uppercase; white-space: nowrap; }
+  .os-card { flex: 999 1 460px; min-width: 0; background: var(--ink); color: #F2F0EB; border-radius: 6px; padding: 28px; display: flex; flex-direction: column; gap: 24px; }
+  .os-card-top { display: flex; justify-content: space-between; align-items: center; gap: 16px; font-size: 14px; letter-spacing: .06em; }
+  .os-card-top .step { color: var(--accent); }
+  .os-card-top .meta { font-size: 12px; color: #A8A6A0; }
+  .os-gallery { display: flex; gap: 8px; overflow-x: auto; scroll-snap-type: x mandatory; border-radius: 4px; }
+  .os-tile { flex: 0 0 100%; height: 340px; border-radius: 4px; overflow: hidden; scroll-snap-align: start; background: #fff; display: flex; align-items: center; justify-content: center; }
+  .os-tile img { width: 100%; height: 100%; display: block; object-fit: contain; }
+  .os-tile.photo { flex: 0 0 255px; background: #1A1A19; }
+  .os-tile.wide { background: #1A1A19; }
+  .os-tile.photo img, .os-tile.wide img { object-fit: cover; }
+  .os-count { margin: 8px 0 0; font-size: 12px; letter-spacing: .06em; color: #A8A6A0; text-align: right; }
+  .os-card h3 { margin: 0 0 12px; font-weight: 700; font-size: 44px; line-height: 1; letter-spacing: -.02em; text-transform: uppercase; }
+  .os-card .text { margin: 0; font-size: 17px; line-height: 1.6; color: #C9C7C1; max-width: 560px; }
+  .os-nav { display: flex; gap: 8px; justify-content: flex-end; }
+  .os-nav button { min-width: 48px; min-height: 48px; border-radius: 4px; cursor: pointer; font-family: inherit; font-size: 12px; letter-spacing: .06em; padding: 0 16px; }
+  .os-nav .prev { border: 1px solid #55544F; background: transparent; color: #F2F0EB; }
+  .os-nav .next { border: 1px solid var(--accent); background: var(--accent); color: var(--ink); }
+  .os-foot { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px; }
+  .os-dots { display: flex; gap: 6px; }
+  .os-dots span { display: block; height: 6px; width: 6px; border-radius: 3px; background: #B5B4AE; transition: width .25s ease; }
+  .os-dots span.on { width: 32px; background: var(--ink); }
+  .os-cta { display: inline-flex; align-items: center; min-height: 48px; padding: 0 28px; background: var(--ink); color: #F2F0EB; border-radius: 4px; font-size: 14px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; text-decoration: none; }
+  .os-cta:hover { background: #000; color: #fff; }
+  @media (max-width: 640px) { .os { padding: 56px 16px; } .os-sub { align-items: flex-start; text-align: left; } .os-card h3 { font-size: 34px; } }
+</style>
+</head>
+<body>
+
+<section class="os" id="origin-story" aria-labelledby="os-title">
+  <div class="os-wrap">
+    <div class="os-head">
+      <div>
+        <p class="os-kicker">THE MAKING OF</p>
+        <h2 class="os-title" id="os-title">Origin Story</h2>
+      </div>
+      <div class="os-sub">
+        <p class="lead">From idea to finished piece.</p>
+        <p class="hint">Tap any step to see the story.</p>
+      </div>
+    </div>
+    <div class="os-steps" id="os-steps"></div>
+    <div class="os-foot">
+      <div class="os-dots" id="os-dots" aria-hidden="true"></div>
+      <a class="os-cta" href="/collections/all">Shop the collection</a>
+    </div>
+  </div>
+</section>
+
+<script>
+(function () {
+  // Change IMG to your image host (e.g. Shopify Files URL prefix) if images live elsewhere.
+  var IMG = 'images/';
+  var steps = [
+    { label: 'Idea', meta: '', text: 'Not another hoodie or tee. In Asia, we found the hooded scarf. We made it ours: satin-lined hood, embroidered logos, a small yellow patch. That’s where it all began.',
+      imgs: [{ src: '01-idea.jpg', alt: 'First hand sketches of the hooded scarf: side logo idea and hood measurements with satin lining' }] },
+    { label: 'Moodboard', meta: 'SKETCHES', text: 'We didn’t stop until the shape and colour felt right.',
+      imgs: [{ src: '02-moodboard.jpg', alt: 'Design sketches: black and grey hooded scarf, grey and black beanie' }] },
+    { label: 'Techpack', meta: 'WOWS-HSC-001', text: 'Measurements, materials, colours, logo placement. Everything written down, so nothing gets lost in production.',
+      imgs: [{ src: '03-techpack-scarf.jpg', alt: 'Hooded scarf techpack details' }, { src: '03-techpack-beanie.jpg', alt: 'Beanie techpack details' }, { src: '03-techpack-page.jpg', alt: 'First page of the hooded scarf techpack' }] },
+    { label: 'First Sample', meta: '', type: 'photo', text: 'We held it, wore it, tested it. Then came the messages, until it was finished.',
+      imgs: [{ src: '04-sample-1.jpg', alt: 'First sample: black cuffed beanie' }, { src: '04-sample-2.jpg', alt: 'First sample: black beanie with embroidered logo' }, { src: '04-sample-3.jpg', alt: 'First sample: scarf tail with yellow tag' }, { src: '04-sample-4.jpg', alt: 'First sample: embroidered logo on the hood' }] },
+    { label: 'Bulk', meta: '', type: 'wide', text: 'Sample approved. Full production, packing and the long trip to us.',
+      imgs: [{ src: '05-bulk.jpg', alt: 'Bulk delivery: branded bags and open boxes' }] },
+    { label: 'Final Piece', meta: 'FW26', type: 'photo', text: 'The piece you see is the whole journey. Now it’s ready to be yours.',
+      imgs: [{ src: '06-final-1.jpg', alt: 'Grey hooded scarf' }, { src: '06-final-2.jpg', alt: 'Black hooded scarf' }, { src: '06-final-3.jpg', alt: 'Black beanie', pos: 'center 80%' }, { src: '06-final-4.jpg', alt: 'Grey beanie' }] }
+  ];
+
+  var current = 0;
+  var root = document.getElementById('os-steps');
+  var dots = document.getElementById('os-dots');
+  function pad(n) { return String(n + 1).padStart(2, '0'); }
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function go(k) { current = (k + steps.length) % steps.length; render(); }
+
+  function card(s, k) {
+    var cls = s.type ? 'os-tile ' + s.type : 'os-tile';
+    var tiles = s.imgs.map(function (p) {
+      var pos = p.pos ? ' style="object-position:' + p.pos + '"' : '';
+      return '<div class="' + cls + '"><img loading="lazy" src="' + IMG + p.src + '" alt="' + esc(p.alt) + '"' + pos + '></div>';
+    }).join('');
+    var count = s.imgs.length > 1 ? '<p class="os-count">' + s.imgs.length + ' IMAGES · SWIPE →</p>' : '';
+    return '<article class="os-card">' +
+      '<div class="os-card-top"><span class="step">STEP ' + pad(k) + '</span><span class="meta">' + esc(s.meta) + '</span></div>' +
+      '<div><div class="os-gallery">' + tiles + '</div>' + count + '</div>' +
+      '<div><h3>' + esc(s.label) + '</h3><p class="text">' + esc(s.text) + '</p></div>' +
+      '<div class="os-nav"><button type="button" class="prev" aria-label="Previous step">← BACK</button><button type="button" class="next" aria-label="Next step">NEXT →</button></div>' +
+      '</article>';
+  }
+  function tab(s, k) {
+    return '<button type="button" class="os-tab" data-k="' + k + '" aria-label="Step ' + (k + 1) + ': ' + esc(s.label) + '"><span class="n">' + pad(k) + '</span><span class="l">' + esc(s.label) + '</span></button>';
+  }
+  function render() {
+    root.innerHTML = steps.map(function (s, k) { return k === current ? card(s, k) : tab(s, k); }).join('');
+    dots.innerHTML = steps.map(function (s, k) { return '<span' + (k === current ? ' class="on"' : '') + '></span>'; }).join('');
+  }
+  root.addEventListener('click', function (e) {
+    var t = e.target.closest('button'); if (!t) return;
+    if (t.classList.contains('prev')) go(current - 1);
+    else if (t.classList.contains('next')) go(current + 1);
+    else if (t.dataset.k) go(+t.dataset.k);
+  });
+  render();
+})();
+</script>
+</body>
+</html>

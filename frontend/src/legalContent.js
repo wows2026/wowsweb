@@ -1022,7 +1022,7 @@ export const LEGAL_DOCS = {
       },
       {
         "type": "p",
-        "text": "Web načítá písma ze služeb Google Fonts a cdnfonts, které tak vidí vaši IP adresu. Vyberete-li doručení do boxu, otevře se mapa DPD; platba kartou probíhá na stránce Teya. Tyto služby mohou používat vlastní cookies podle svých zásad."
+        "text": "Web načítá písmo ze služby Google Fonts, která tak vidí vaši IP adresu. Vyberete-li doručení do boxu, otevře se mapa DPD; platba kartou probíhá na stránce Teya. Přehrajete-li video na stránce, načte se přehrávač Instagramu nebo TikToku. Tyto služby mohou používat vlastní cookies podle svých zásad."
       },
       {
         "type": "h2",

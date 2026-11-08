@@ -4,6 +4,40 @@ import axios from "axios";
 export const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const CART_KEY = "wino_cart_id";
 const CURRENCY_KEY = "wino_currency";
+const DEADLINE_KEY = "wino_checkout_deadline";
+const QUEST_MS = 10 * 60 * 1000;
+
+let memoryDeadline = null;
+const readDeadline = () => {
+  try {
+    return Number(sessionStorage.getItem(DEADLINE_KEY)) || null;
+  } catch {
+    return memoryDeadline;
+  }
+};
+const writeDeadline = (value) => {
+  memoryDeadline = value;
+  try {
+    if (value) sessionStorage.setItem(DEADLINE_KEY, String(value));
+    else sessionStorage.removeItem(DEADLINE_KEY);
+  } catch {}
+};
+
+// Survives reloads, so refreshing the page doesn't restart it.
+export function questDeadline() {
+  let deadline = readDeadline();
+  if (!deadline) {
+    deadline = Date.now() + QUEST_MS;
+    writeDeadline(deadline);
+  }
+  return deadline;
+}
+
+// Shopify's CDN resizes on request; the originals are up to 1.3 MB each.
+export function sizedImage(url, width) {
+  if (!url || !url.includes("cdn.shopify.com")) return url;
+  return `${url}${url.includes("?") ? "&" : "?"}width=${width}`;
+}
 
 export function formatPrice(money, lang) {
   if (!money) return "";
@@ -66,7 +100,10 @@ export function CartProvider({ children }) {
     }
   };
 
-  const addLine = async (variantId, quantity = 1) => {
+  const addLine = async (variantId, quantity = 1, { openCart = true } = {}) => {
+    // A new product after the time ran out starts a fresh countdown.
+    const deadline = readDeadline();
+    if (deadline && deadline <= Date.now()) writeDeadline(null);
     setBusy(true);
     try {
       if (!cart) {
@@ -80,7 +117,7 @@ export function CartProvider({ children }) {
           else throw e;
         }
       }
-      setOpen(true);
+      if (openCart) setOpen(true);
     } finally {
       setBusy(false);
     }

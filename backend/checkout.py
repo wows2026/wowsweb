@@ -315,7 +315,7 @@ async def _suggest_addresses(query: str, country: str, session: str) -> list:
     """Autocomplete is a convenience: without a key or when Google fails the buyer just types the address."""
     key = _places_key()
     query = query.strip()
-    if not key or not 3 <= len(query) <= 120 or not re.fullmatch(r"[A-Z]{2}", country) or not ADDRESS_SESSION_RE.match(session):
+    if not key or not 1 <= len(query) <= 120 or not re.fullmatch(r"[A-Z]{2}", country) or not ADDRESS_SESSION_RE.match(session):
         return []
     try:
         async with httpx.AsyncClient(timeout=4) as client:

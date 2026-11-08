@@ -5,7 +5,7 @@
 body {
     margin: 0;
     font-family: "Helvetica Now Display", "Helvetica Neue", Helvetica, Arial, sans-serif;
-    background-color: #faf9f6;
+    background-color: #e8e8e8;
     color: #0d0d0d;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -39,10 +39,17 @@ html.lenis body {
     }
 }
 .animate-marquee-right {
-    animation: marquee-right 26s linear infinite;
+    animation: marquee-right 50s linear infinite;
 }
 .animate-marquee-right:hover {
     animation-play-state: paused;
+}
+
+/* Studio shots have a light backdrop of their own: brightness clips it to white, multiply turns white into the
+   page colour, and the two cancel out on the product itself. */
+.product-photo {
+    filter: brightness(1.1);
+    mix-blend-mode: multiply;
 }
 
 /* Film grain overlay */

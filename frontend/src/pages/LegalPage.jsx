@@ -26,7 +26,7 @@ function Block({ b }) {
           <thead>
             <tr>
               {b.rows[0].map((c, i) => (
-                <th key={i} className="border-b border-zinc-200 bg-[#F4F4F0] px-3 py-2.5 font-mono text-[10px] font-bold tracking-[0.1em] uppercase">
+                <th key={i} className="border-b border-zinc-200 bg-[#E8E8E8] px-3 py-2.5 font-mono text-[10px] font-bold tracking-[0.1em] uppercase">
                   {c}
                 </th>
               ))}

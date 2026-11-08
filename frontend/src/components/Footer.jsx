@@ -15,16 +15,8 @@ export default function Footer() {
         { label: lang === "cz" ? "Obchodní podmínky" : "Terms & Conditions", to: "/legal/terms" },
         { label: lang === "cz" ? "Ochrana osobních údajů" : "Privacy Policy", to: "/legal/privacy" },
         { label: "Cookies", to: "/legal/cookies" },
-      ],
-    },
-    {
-      title: t.footer.headings.care,
-      prefix: "footer-care",
-      items: [
         { label: lang === "cz" ? "Podmínky dopravy" : "Shipping Policy", to: "/legal/shipping" },
         { label: lang === "cz" ? "Vrácení zboží" : "Refund Policy", to: "/legal/refund" },
-        { label: lang === "cz" ? "Tabulka velikostí" : "Size Guide", to: null },
-        { label: lang === "cz" ? "Kontakt" : "Contact Us", to: "/contact" },
       ],
     },
   ];
@@ -39,38 +31,29 @@ export default function Footer() {
       <div className="mb-14 grid grid-cols-1 gap-12 lg:grid-cols-[1.4fr_1fr]">
         <div>
           <img src="/logo-main-white.png" alt="WINORWINS" className="h-11 w-auto sm:h-14" />
-          <p className="mt-5 max-w-sm font-mono text-[11px] leading-relaxed tracking-[0.15em] text-zinc-500">
-            VICTORY IN EVERY FIBER. HEAVYWEIGHT ESSENTIALS, LIMITED RUNS, NO RESTOCKS.
-          </p>
           <a
             href={`mailto:${t.footer.email}`}
             data-testid="footer-contact-email"
-            className="mt-6 inline-block border-b border-[#FFE600] pb-0.5 font-mono text-xs tracking-[0.15em] text-[#FFE600] transition-colors hover:text-white"
+            className="mt-3 inline-block border-b border-[#FFE600] pb-0.5 font-mono text-xs tracking-[0.15em] text-[#FFE600] transition-colors hover:text-white"
           >
             {t.footer.email}
           </a>
         </div>
 
-        <div className="grid grid-cols-2 gap-8 sm:grid-cols-3">
+        <div className="grid grid-cols-2 gap-8">
           {columns.map((col) => (
             <div key={col.title}>
               <p className="mb-4 font-mono text-[10px] font-bold tracking-[0.25em] text-zinc-500">{col.title}</p>
               <ul className="space-y-2.5">
                 {col.items.map((item, i) => (
                   <li key={item.label}>
-                    {item.to ? (
-                      <Link
-                        to={item.to}
-                        data-testid={`${col.prefix}-link-${i}`}
-                        className="text-sm text-zinc-400 transition-colors hover:text-[#FFE600]"
-                      >
-                        {item.label}
-                      </Link>
-                    ) : (
-                      <span data-testid={`${col.prefix}-link-${i}`} className="text-sm text-zinc-600">
-                        {item.label}
-                      </span>
-                    )}
+                    <Link
+                      to={item.to}
+                      data-testid={`${col.prefix}-link-${i}`}
+                      className="text-sm text-zinc-400 transition-colors hover:text-[#FFE600]"
+                    >
+                      {item.label}
+                    </Link>
                   </li>
                 ))}
               </ul>
@@ -103,10 +86,10 @@ export default function Footer() {
           whileInView={{ y: "0%", opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-          className="font-display text-[13.5vw] leading-[0.85] font-extrabold tracking-tight text-[#FFE600] uppercase select-none"
+          className="font-display text-[12.8vw] leading-[0.85] font-extrabold tracking-tight text-[#FFE600] uppercase select-none"
           data-testid="footer-wordmark"
         >
-          WINORWINS
+          WINORWINS.
         </motion.p>
       </div>
 

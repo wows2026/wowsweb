@@ -5,7 +5,9 @@ import { ArrowLeft, Lock } from "lucide-react";
 import { toast } from "sonner";
 import axios from "axios";
 import { useLanguage } from "@/i18n";
-import { useCart, formatPrice, API } from "@/shop";
+import { useCart, formatPrice, API, sizedImage } from "@/shop";
+import OriginStory from "@/components/OriginStory";
+import { ProductsGrid } from "@/components/FeaturedProducts";
 
 export default function ProductPage() {
   const { handle } = useParams();
@@ -14,6 +16,7 @@ export default function ProductPage() {
   const [product, setProduct] = useState(undefined);
   const [selected, setSelected] = useState({});
   const [activeImage, setActiveImage] = useState(0);
+  const [similar, setSimilar] = useState([]);
 
   useEffect(() => {
     setProduct(undefined);
@@ -30,6 +33,7 @@ export default function ProductPage() {
         if (ignore) return;
         const p = r.data.find((x) => x.handle === handle) || null;
         setProduct(p);
+        setSimilar(r.data.filter((x) => x.handle !== handle && x.available).slice(0, 4));
         if (p) {
           setSelected((prev) => {
             if (Object.keys(prev).length) return prev;
@@ -89,7 +93,7 @@ export default function ProductPage() {
           <div className="mt-8 h-10 w-3/4 animate-pulse bg-zinc-100" />
           <div className="mt-6 h-40 w-full animate-pulse bg-zinc-100" />
         </div>
-        <div className="animate-pulse bg-[#F4F4F0]" />
+        <div className="bg-wino-photo animate-pulse" />
         <div className="px-5 py-12 sm:px-8">
           <div className="h-6 w-24 animate-pulse bg-zinc-100" />
         </div>
@@ -174,34 +178,36 @@ export default function ProductPage() {
           initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="order-1 flex flex-col bg-[#F4F4F0] lg:order-2"
+          className="order-1 flex flex-col lg:order-2"
         >
           <div className="flex flex-1 items-center justify-center p-6 sm:p-10">
             {mainImage ? (
-              <motion.img
-                key={mainImage}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5 }}
-                src={mainImage}
-                alt={product.name}
-                data-testid="product-image"
-                className="max-h-[55vh] w-auto object-contain lg:max-h-[72vh]"
-              />
+              <div className="bg-wino-photo">
+                <motion.img
+                  key={mainImage}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.5 }}
+                  src={sizedImage(mainImage, 1400)}
+                  alt={product.name}
+                  data-testid="product-image"
+                  className="product-photo max-h-[55vh] w-auto object-contain lg:max-h-[72vh]"
+                />
+              </div>
             ) : (
               <div className="aspect-[3/4] w-full max-w-md" />
             )}
           </div>
           {images.length > 1 && (
-            <div className="flex justify-center gap-2 pb-6" data-testid="product-thumbnails">
+            <div className="flex flex-wrap justify-center gap-2 px-6 pb-12" data-testid="product-thumbnails">
               {images.map((src, i) => (
                 <button
                   key={src}
                   onClick={() => setActiveImage(i)}
                   data-testid={`product-thumb-${i}`}
-                  className={`h-16 w-12 overflow-hidden border-2 transition-colors ${i === activeImage ? "border-black" : "border-transparent"}`}
+                  className={`bg-wino-photo h-16 w-12 overflow-hidden border-2 transition-colors ${i === activeImage ? "border-black" : "border-transparent"}`}
                 >
-                  <img src={src} alt="" className="h-full w-full object-cover" />
+                  <img src={sizedImage(src, 160)} alt="" loading="lazy" className="product-photo h-full w-full object-cover" />
                 </button>
               ))}
             </div>
@@ -218,6 +224,24 @@ export default function ProductPage() {
             {compareAt && <span className="mr-2 text-lg font-normal text-zinc-400 line-through">{formatPrice(compareAt, lang)}</span>}
             {formatPrice(price, lang)}
           </p>
+
+          {product.specs?.length > 0 && (
+            <dl className="mt-6 divide-y divide-zinc-400 border-y border-zinc-400" data-testid="product-specs">
+              {product.specs.map((spec) =>
+                spec.value.includes("\n") ? (
+                  <div key={spec.label} className="py-3">
+                    <dt className="font-mono text-[10px] font-bold tracking-[0.2em] text-zinc-600 uppercase">{spec.label}</dt>
+                    <dd className="mt-2 text-xs leading-relaxed font-semibold whitespace-pre-line">{spec.value}</dd>
+                  </div>
+                ) : (
+                  <div key={spec.label} className="flex items-baseline justify-between gap-6 py-2.5">
+                    <dt className="font-mono text-[10px] font-bold tracking-[0.2em] text-zinc-600 uppercase">{spec.label}</dt>
+                    <dd className="text-right text-sm font-semibold">{spec.value}</dd>
+                  </div>
+                )
+              )}
+            </dl>
+          )}
 
           {optionGroups.map(([name, values]) => (
             <div key={name} className="mt-8">
@@ -264,6 +288,15 @@ export default function ProductPage() {
           )}
         </motion.div>
       </div>
+
+      <OriginStory />
+
+      {similar.length > 0 && (
+        <section className="px-5 py-20 sm:px-8 sm:py-28" data-testid="product-similar">
+          <h2 className="font-display mb-12 text-3xl leading-none font-extrabold tracking-tight uppercase sm:text-5xl">{t.product.similar}</h2>
+          <ProductsGrid products={similar} />
+        </section>
+      )}
     </div>
   );
 }

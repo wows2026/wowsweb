@@ -1,14 +1,14 @@
+
 function MarqueeRow({ ariaHidden }) {
   return (
     <div className="flex shrink-0 items-center" aria-hidden={ariaHidden}>
       {Array.from({ length: 6 }).map((_, i) => (
-        <img
-          key={i}
-          src="/logo-mark-black.png"
-          alt="WINORWINS"
-          className="h-10 w-auto px-10 sm:h-12"
-          draggable="false"
-        />
+        <span key={i} className="font-display flex items-center text-lg font-extrabold tracking-tight whitespace-nowrap text-black uppercase sm:text-2xl">
+          FIRST DROP ORIGIN STORY OUT NOW
+          <img src="/logo-mark-black.png" alt="" draggable="false" className="mx-8 h-7 w-auto sm:mx-14 sm:h-9" />
+          LIMITED STOCK
+          <img src="/logo-mark-black.png" alt="" draggable="false" className="mx-8 h-7 w-auto sm:mx-14 sm:h-9" />
+        </span>
       ))}
     </div>
   );

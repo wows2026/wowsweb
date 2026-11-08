@@ -21,6 +21,8 @@ module.exports = {
           neon: "#E5FF00",
           ink: "#0D0D0D",
           paper: "#FAF9F6",
+          photo: "#D2D2D2",
+          band: "#DCDCDC",
         },
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',

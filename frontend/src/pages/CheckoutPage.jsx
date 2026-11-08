@@ -1,12 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Link, useSearchParams } from "react-router-dom";
-import { motion } from "framer-motion";
-import { ChevronDown, Lock, Loader2, MapPin, X } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { ArrowLeft, ArrowRight, Check, ChevronDown, Lock, Loader2, MapPin, X } from "lucide-react";
 import { toast } from "sonner";
 import axios from "axios";
 import { useLanguage } from "@/i18n";
-import { API, useCart, formatPrice } from "@/shop";
+import { API, useCart, formatPrice, sizedImage } from "@/shop";
+import { QuestTimer, CartUpsell } from "@/components/CheckoutExtras";
 
 // The Shopify store ships to the EU except Cyprus and Malta; country names come from the browser in the page language.
 const COUNTRIES = ["CZ", "SK", "AT", "BE", "BG", "DE", "DK", "EE", "ES", "FI", "FR", "GR", "HR", "HU", "IE", "IT", "LT", "LU", "LV", "NL", "PL", "PT", "RO", "SE", "SI"];
@@ -17,12 +18,13 @@ const DIAL_CODES = {
   CH: "41", GB: "44", NO: "47", UA: "380", US: "1", VN: "84",
 };
 const FORM_KEY = "wino_checkout_form";
+const STEP_KEY = "wino_checkout_step";
 const NAVBAR_HEIGHT = 90;
 const DPD_WIDGET = "https://api.dpd.cz/widget/latest/index.html";
 
 const labelCls = "mb-2 block font-mono text-[10px] font-bold tracking-[0.25em] text-zinc-500";
 const inputCls =
-  "w-full border-b-2 border-zinc-300 bg-transparent py-3 text-base outline-none transition-colors placeholder-zinc-400 focus:border-black sm:text-sm";
+  "w-full border-b-2 border-zinc-400 bg-transparent py-3 text-base outline-none transition-colors placeholder-zinc-500 focus:border-black sm:text-sm";
 
 const flag = (code) => String.fromCodePoint(...[...code].map((ch) => 0x1f1a5 + ch.charCodeAt(0)));
 
@@ -57,7 +59,7 @@ function PhoneField({ label, codeLabel, lang, form, setForm }) {
         {label}
       </label>
       <div className="flex gap-3">
-        <div className="relative shrink-0 border-b-2 border-zinc-300 transition-colors focus-within:border-black">
+        <div className="relative shrink-0 border-b-2 border-zinc-400 transition-colors focus-within:border-black">
           <span className="pointer-events-none flex h-full items-center gap-1.5 pr-1 text-base sm:text-sm" data-testid="checkout-phone-code">
             {flag(form.phone_country)} +{DIAL_CODES[form.phone_country]}
             <ChevronDown className="h-3.5 w-3.5 text-zinc-500" />
@@ -107,13 +109,16 @@ function AddressField({ label, placeholder, noMatch, country, value, onType, onP
   const [notFound, setNotFound] = useState(false);
   const timer = useRef(null);
   const seq = useRef(0);
+  const shown = useRef(0);
+  const latest = useRef("");
   const input = useRef(null);
   const list = useRef(null);
   const session = useRef(newAddressSession());
 
   const close = () => {
     clearTimeout(timer.current);
-    seq.current++;
+    timer.current = null;
+    shown.current = ++seq.current;
     setItems([]);
     setActive(-1);
     setNotFound(false);
@@ -136,28 +141,33 @@ function AddressField({ label, placeholder, noMatch, country, value, onType, onP
   const onChange = (e) => {
     const q = e.target.value;
     onType(q);
-    clearTimeout(timer.current);
-    const mine = ++seq.current;
-    if (q.trim().length < 3) {
-      setItems([]);
-      setNotFound(false);
+    latest.current = q;
+    if (!q.trim()) {
+      close();
       return;
     }
+    // Throttled, not debounced: the list has to follow the typing instead of waiting for a pause.
+    if (timer.current) return;
     timer.current = setTimeout(async () => {
+      timer.current = null;
+      const query = latest.current;
+      const mine = ++seq.current;
       try {
-        const r = await axios.get(`${API}/checkout/address-suggest`, { params: { q, country, session: session.current } });
+        const r = await axios.get(`${API}/checkout/address-suggest`, { params: { q: query, country, session: session.current } });
         // Browser autofill also fires onChange; don't open a list on a field the buyer isn't in.
-        if (mine !== seq.current || document.activeElement !== input.current) return;
+        if (mine < shown.current || document.activeElement !== input.current) return;
+        shown.current = mine;
         setItems(r.data.items);
         setActive(-1);
-        setNotFound(r.data.items.length === 0);
+        setNotFound(r.data.items.length === 0 && query.trim().length >= 3);
       } catch {
-        if (mine === seq.current) {
+        if (mine >= shown.current) {
+          shown.current = mine;
           setItems([]);
-          setNotFound(true);
+          setNotFound(query.trim().length >= 3);
         }
       }
-    }, 250);
+    }, 120);
   };
 
   const pick = async (item) => {
@@ -212,7 +222,7 @@ function AddressField({ label, placeholder, noMatch, country, value, onType, onP
         onBlur={close}
       />
       {items.length > 0 && (
-        <ul ref={list} id="checkout-address-list" role="listbox" className="absolute top-full right-0 left-0 z-30 border-2 border-t-0 border-black bg-white" data-testid="checkout-address-list">
+        <ul ref={list} id="checkout-address-list" role="listbox" className="absolute top-full right-0 left-0 z-30 border-2 border-t-0 border-black bg-[#E8E8E8]" data-testid="checkout-address-list">
           {items.map((item, i) => (
             <li
               key={item.placeId}
@@ -238,13 +248,17 @@ function AddressField({ label, placeholder, noMatch, country, value, onType, onP
         </ul>
       )}
       {notFound && (
-        <p ref={list} role="status" className="absolute top-full right-0 left-0 z-30 border-2 border-t-0 border-black bg-white px-3 py-3 text-xs text-zinc-600" data-testid="checkout-address-none">
+        <p ref={list} role="status" className="absolute top-full right-0 left-0 z-30 border-2 border-t-0 border-black bg-[#E8E8E8] px-3 py-3 text-xs text-zinc-600" data-testid="checkout-address-none">
           {noMatch}
         </p>
       )}
     </div>
   );
 }
+
+const questButton =
+  "flex w-full items-center justify-center gap-3 bg-[#0D0D0D] px-4 py-5 font-mono text-xs font-bold tracking-[0.25em] text-white transition-colors duration-300 hover:bg-[#FFE600] hover:text-black";
+const questBack = "mx-auto flex w-fit items-center gap-2 font-mono text-[11px] font-bold tracking-[0.2em] text-zinc-500 transition-colors hover:text-black";
 
 function Field({ id, label, className = "", ...props }) {
   return (
@@ -254,6 +268,39 @@ function Field({ id, label, className = "", ...props }) {
       </label>
       <input id={id} data-testid={id} className={inputCls} {...props} />
     </div>
+  );
+}
+
+function QuestProgress({ c, step, onOpen }) {
+  const quests = [c.contact, c.delivery, c.shipping];
+  return (
+    <ol className="mb-10 grid grid-cols-3 gap-2" data-testid="checkout-progress">
+      {quests.map((name, i) => {
+        const n = i + 1;
+        const done = n < step;
+        const active = n === step;
+        return (
+          <li key={name}>
+            <button
+              type="button"
+              disabled={!done}
+              onClick={() => onOpen(n)}
+              data-testid={`checkout-quest-${n}`}
+              data-state={done ? "done" : active ? "active" : "locked"}
+              className={`flex h-full min-h-20 w-full flex-col justify-between gap-2 border-2 p-3 text-left transition-colors ${
+                active ? "border-black bg-[#0D0D0D] text-white" : done ? "cursor-pointer border-black bg-[#FFE600] text-black" : "border-zinc-400 text-zinc-500"
+              }`}
+            >
+              <span className="flex items-center justify-between font-mono text-[10px] font-bold tracking-[0.2em]">
+                {c.quest} {n}
+                {done ? <Check className="h-3.5 w-3.5" /> : !active && <Lock className="h-3 w-3" />}
+              </span>
+              <span className="text-[11px] leading-tight font-extrabold tracking-tight uppercase sm:text-sm">{name}</span>
+            </button>
+          </li>
+        );
+      })}
+    </ol>
   );
 }
 
@@ -280,6 +327,14 @@ export default function CheckoutPage() {
   const [pickup, setPickup] = useState(null);
   const [mapOpen, setMapOpen] = useState(false);
   const quoteSeq = useRef(0);
+  const questTop = useRef(null);
+  const [step, setStep] = useState(() => {
+    try {
+      return Number(sessionStorage.getItem(STEP_KEY)) || 1;
+    } catch {
+      return 1;
+    }
+  });
 
   // DPD's map runs in an iframe and posts the chosen box (or a close event) back to this window.
   useEffect(() => {
@@ -313,6 +368,22 @@ export default function CheckoutPage() {
     } catch {}
   }, [form]);
 
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(STEP_KEY, String(step));
+    } catch {}
+  }, [step]);
+
+  const openStep = (n) => {
+    setStep(n);
+    const top = questTop.current?.getBoundingClientRect().top;
+    if (top !== undefined) window.scrollBy(0, top - 150);
+  };
+  const nextStep = (e) => {
+    e.preventDefault();
+    openStep(step + 1);
+  };
+
   const set = (key) => (e) => setForm((f) => ({ ...f, [key]: e.target.value }));
   // The phone code follows the delivery country until a number has been typed.
   const setCountry = (e) => {
@@ -322,6 +393,10 @@ export default function CheckoutPage() {
 
   // Shipping rates come from Shopify for the typed address; re-quote when the address (or cart) changes.
   const addressReady = form.address1.trim() && form.city.trim() && form.zip.trim() && form.country;
+  // A restored session can't sit on a quest whose earlier answers are missing.
+  const contactReady = form.email.trim() && form.phone.trim();
+  const namesReady = form.first_name.trim() && form.last_name.trim();
+  const currentStep = !contactReady ? 1 : !(addressReady && namesReady) ? Math.min(step, 2) : step;
   const cartKey = cart ? `${cart.id}|${cart.totalQuantity}|${cart.total?.amount}` : "";
   useEffect(() => {
     if (!cart || !addressReady) return;
@@ -421,136 +496,170 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="px-5 pt-28 pb-20 sm:px-8" data-testid="checkout-page">
-      <h1 className="font-display mb-10 text-4xl leading-[0.95] font-extrabold tracking-tight uppercase sm:text-6xl">{c.title}</h1>
+    <div className="px-5 pt-16 pb-20 sm:px-8" data-testid="checkout-page">
+      <QuestTimer className="sticky top-16 z-30 -mx-5 mb-8 sm:-mx-8 sm:px-8" />
+      <h1 className="font-display mb-8 text-4xl leading-[0.95] font-extrabold tracking-tight uppercase sm:text-6xl">{c.title}</h1>
       <div className="grid gap-12 lg:grid-cols-[1fr_420px] lg:gap-16">
-        <form onSubmit={submit} className="flex flex-col gap-10" data-testid="checkout-form">
-          <section>
-            <p className="mb-5 font-mono text-xs font-bold tracking-[0.25em]">{c.contact}</p>
-            <div className="grid gap-6 sm:grid-cols-2">
-              <Field id="checkout-email" label={c.email} type="email" autoComplete="email" required value={form.email} onChange={set("email")} />
-              <PhoneField label={c.phone} codeLabel={c.phoneCode} lang={lang} form={form} setForm={setForm} />
-            </div>
-          </section>
+        <div ref={questTop}>
+          <QuestProgress c={c} step={currentStep} onOpen={openStep} />
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div key={currentStep} initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -24 }} transition={{ duration: 0.25 }}>
+              {currentStep === 1 && (
+                <form onSubmit={nextStep} className="flex flex-col gap-8" data-testid="checkout-step-contact">
+                  <section>
+                    <p className="mb-5 font-mono text-xs font-bold tracking-[0.25em]">{c.quest} 1 — {c.contact}</p>
+                    <div className="grid gap-6 sm:grid-cols-2">
+                      <Field id="checkout-email" label={c.email} type="email" autoComplete="email" required value={form.email} onChange={set("email")} />
+                      <PhoneField label={c.phone} codeLabel={c.phoneCode} lang={lang} form={form} setForm={setForm} />
+                    </div>
+                  </section>
+                  <button type="submit" className={questButton} data-testid="checkout-next">
+                    {c.nextQuest}
+                    <ArrowRight className="h-4 w-4" />
+                  </button>
+                </form>
+              )}
 
-          <section>
-            <p className="mb-5 font-mono text-xs font-bold tracking-[0.25em]">{c.delivery}</p>
-            <div className="grid gap-6 sm:grid-cols-2">
-              <Field id="checkout-first-name" label={c.firstName} autoComplete="given-name" required value={form.first_name} onChange={set("first_name")} />
-              <Field id="checkout-last-name" label={c.lastName} autoComplete="family-name" required value={form.last_name} onChange={set("last_name")} />
-              <div className="sm:col-span-2">
-                <label htmlFor="checkout-country" className={labelCls}>
-                  {c.country}
-                </label>
-                <select id="checkout-country" data-testid="checkout-country" autoComplete="country" value={form.country} onChange={setCountry} className={`${inputCls} cursor-pointer`}>
-                  {countryNames.map(({ code, name }) => (
-                    <option key={code} value={code}>
-                      {name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <AddressField
-                label={c.address1}
-                placeholder={c.addressPlaceholder}
-                noMatch={c.addressNone}
-                country={form.country}
-                value={form.address1}
-                onType={(address1) => setForm((f) => ({ ...f, address1 }))}
-                onPick={({ address1, city, zip }) => setForm((f) => ({ ...f, address1, city, zip }))}
-              />
-              <Field id="checkout-address2" className="sm:col-span-2" label={c.address2} autoComplete="address-line2" value={form.address2} onChange={set("address2")} />
-              <Field id="checkout-city" label={c.city} autoComplete="address-level2" required value={form.city} onChange={set("city")} />
-              <Field id="checkout-zip" label={c.zip} autoComplete="postal-code" required value={form.zip} onChange={set("zip")} />
-            </div>
-          </section>
+              {currentStep === 2 && (
+                <form onSubmit={nextStep} className="flex flex-col gap-8" data-testid="checkout-step-delivery">
+                  <section>
+                    <p className="mb-5 font-mono text-xs font-bold tracking-[0.25em]">{c.quest} 2 — {c.delivery}</p>
+                    <div className="grid gap-6 sm:grid-cols-2">
+                      <Field id="checkout-first-name" label={c.firstName} autoComplete="given-name" required value={form.first_name} onChange={set("first_name")} />
+                      <Field id="checkout-last-name" label={c.lastName} autoComplete="family-name" required value={form.last_name} onChange={set("last_name")} />
+                      <div className="sm:col-span-2">
+                        <label htmlFor="checkout-country" className={labelCls}>
+                          {c.country}
+                        </label>
+                        <select id="checkout-country" data-testid="checkout-country" autoComplete="country" value={form.country} onChange={setCountry} className={`${inputCls} cursor-pointer`}>
+                          {countryNames.map(({ code, name }) => (
+                            <option key={code} value={code}>
+                              {name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <AddressField
+                        label={c.address1}
+                        placeholder={c.addressPlaceholder}
+                        noMatch={c.addressNone}
+                        country={form.country}
+                        value={form.address1}
+                        onType={(address1) => setForm((f) => ({ ...f, address1 }))}
+                        onPick={({ address1, city, zip }) => setForm((f) => ({ ...f, address1, city, zip }))}
+                      />
+                      <Field id="checkout-address2" className="sm:col-span-2" label={c.address2} autoComplete="address-line2" value={form.address2} onChange={set("address2")} />
+                      <Field id="checkout-city" label={c.city} autoComplete="address-level2" required value={form.city} onChange={set("city")} />
+                      <Field id="checkout-zip" label={c.zip} autoComplete="postal-code" required value={form.zip} onChange={set("zip")} />
+                    </div>
+                  </section>
+                  <button type="submit" className={questButton} data-testid="checkout-next">
+                    {c.nextQuest}
+                    <ArrowRight className="h-4 w-4" />
+                  </button>
+                  <button type="button" onClick={() => openStep(1)} className={questBack}>
+                    <ArrowLeft className="h-3.5 w-3.5" />
+                    {c.back}
+                  </button>
+                </form>
+              )}
 
-          <section data-testid="checkout-shipping">
-            <p className="mb-5 flex items-center gap-2 font-mono text-xs font-bold tracking-[0.25em]">
-              {c.shipping}
-              {quoting && <Loader2 className="h-3.5 w-3.5 animate-spin text-zinc-400" />}
-            </p>
-            {!addressReady || (!quote && !noShipping) ? (
-              <p className="text-sm text-zinc-500">{c.shippingHint}</p>
-            ) : noShipping ? (
-              <p className="text-sm text-red-600" role="alert">{c.shippingNone}</p>
-            ) : (
-              <div className="flex flex-col gap-2" role="radiogroup">
-                {quote.options.map((o) => (
-                  <div key={o.handle} className={`border-2 transition-colors ${delivery === o.handle ? "border-black" : "border-zinc-200 hover:border-zinc-400"}`}>
-                    <label className="flex cursor-pointer items-center justify-between gap-4 px-4 py-4" data-testid="checkout-shipping-option">
-                      <span className="flex items-center gap-3">
-                        <input
-                          type="radio"
-                          name="delivery"
-                          value={o.handle}
-                          checked={delivery === o.handle}
-                          onChange={() => {
-                            setDelivery(o.handle);
-                            if (o.pickup && !pickup) setMapOpen(true);
-                          }}
-                          className="h-4 w-4 accent-black"
-                        />
-                        <span className="text-sm font-semibold">{o.title}</span>
-                      </span>
-                      <span className="text-sm font-bold">{o.amount ? money(o.amount) : c.free}</span>
-                    </label>
-                    {o.pickup && delivery === o.handle && (
-                      <div className="flex items-center justify-between gap-4 border-t border-zinc-200 px-4 py-3" data-testid="checkout-pickup">
-                        {pickup ? (
-                          <p className="flex min-w-0 items-start gap-2 text-xs">
-                            <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-                            <span>
-                              <strong className="block">{pickup.name}</strong>
-                              {pickup.street}, {pickup.zip} {pickup.city}
-                            </span>
-                          </p>
-                        ) : (
-                          <p className="text-xs text-zinc-500">{c.boxHint}</p>
-                        )}
-                        <button
-                          type="button"
-                          onClick={() => setMapOpen(true)}
-                          data-testid="checkout-pickup-button"
-                          className="shrink-0 border border-black px-3 py-2 font-mono text-[10px] font-bold tracking-[0.2em] transition-colors hover:bg-black hover:text-[#FFE600]"
-                        >
-                          {pickup ? c.boxChange : c.boxChoose}
-                        </button>
+              {currentStep === 3 && (
+                <form onSubmit={submit} className="flex flex-col gap-8" data-testid="checkout-form">
+                  <section data-testid="checkout-shipping">
+                    <p className="mb-5 flex items-center gap-2 font-mono text-xs font-bold tracking-[0.25em]">
+                      {c.quest} 3 — {c.shipping}
+                      {quoting && <Loader2 className="h-3.5 w-3.5 animate-spin text-zinc-400" />}
+                    </p>
+                    {!addressReady || (!quote && !noShipping) ? (
+                      <p className="text-sm text-zinc-500">{c.shippingHint}</p>
+                    ) : noShipping ? (
+                      <p className="text-sm text-red-600" role="alert">{c.shippingNone}</p>
+                    ) : (
+                      <div className="flex flex-col gap-2" role="radiogroup">
+                        {quote.options.map((o) => (
+                          <div key={o.handle} className={`border-2 transition-colors ${delivery === o.handle ? "border-black" : "border-zinc-400 hover:border-zinc-600"}`}>
+                            <label className="flex cursor-pointer items-center justify-between gap-4 px-4 py-4" data-testid="checkout-shipping-option">
+                              <span className="flex items-center gap-3">
+                                <input
+                                  type="radio"
+                                  name="delivery"
+                                  value={o.handle}
+                                  checked={delivery === o.handle}
+                                  onChange={() => {
+                                    setDelivery(o.handle);
+                                    if (o.pickup && !pickup) setMapOpen(true);
+                                  }}
+                                  className="h-4 w-4 accent-black"
+                                />
+                                <span className="text-sm font-semibold">{o.title}</span>
+                              </span>
+                              <span className="text-sm font-bold">{o.amount ? money(o.amount) : c.free}</span>
+                            </label>
+                            {o.pickup && delivery === o.handle && (
+                              <div className="flex items-center justify-between gap-4 border-t border-zinc-400 px-4 py-3" data-testid="checkout-pickup">
+                                {pickup ? (
+                                  <p className="flex min-w-0 items-start gap-2 text-xs">
+                                    <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                                    <span>
+                                      <strong className="block">{pickup.name}</strong>
+                                      {pickup.street}, {pickup.zip} {pickup.city}
+                                    </span>
+                                  </p>
+                                ) : (
+                                  <p className="text-xs text-zinc-500">{c.boxHint}</p>
+                                )}
+                                <button
+                                  type="button"
+                                  onClick={() => setMapOpen(true)}
+                                  data-testid="checkout-pickup-button"
+                                  className="shrink-0 border border-black px-3 py-2 font-mono text-[10px] font-bold tracking-[0.2em] transition-colors hover:bg-black hover:text-[#FFE600]"
+                                >
+                                  {pickup ? c.boxChange : c.boxChoose}
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        ))}
                       </div>
                     )}
+                  </section>
+                  <div>
+                    <motion.button
+                      type="submit"
+                      whileHover={{ scale: 1.01 }}
+                      whileTap={{ scale: 0.98 }}
+                      disabled={paying || quoting || !selected}
+                      data-testid="checkout-pay-button"
+                      className="flex w-full items-center justify-center gap-3 bg-[#0D0D0D] px-4 py-5 font-mono text-xs leading-relaxed font-bold tracking-[0.25em] text-white transition-colors duration-300 hover:bg-[#FFE600] hover:text-black disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-[#0D0D0D] disabled:hover:text-white"
+                    >
+                      {paying ? c.paying : selected?.pickup && !pickup ? c.boxChoose : `${c.pay} ${money(total)}`}
+                      <Lock className="h-3.5 w-3.5" />
+                    </motion.button>
+                    <p className="mt-4 text-center text-[11px] leading-relaxed text-balance text-zinc-500">
+                      {c.agree}{" "}
+                      <Link to="/legal/terms" className="underline underline-offset-2 hover:text-black">{c.terms}</Link> {c.and}{" "}
+                      <Link to="/legal/privacy" className="underline underline-offset-2 hover:text-black">{c.privacy}</Link>. {c.secure}
+                    </p>
                   </div>
-                ))}
-              </div>
-            )}
-          </section>
+                  <button type="button" onClick={() => openStep(2)} className={questBack}>
+                    <ArrowLeft className="h-3.5 w-3.5" />
+                    {c.back}
+                  </button>
+                </form>
+              )}
+            </motion.div>
+          </AnimatePresence>
+        </div>
 
-          <div>
-            <motion.button
-              type="submit"
-              whileHover={{ scale: 1.01 }}
-              whileTap={{ scale: 0.98 }}
-              disabled={paying || quoting || !selected}
-              data-testid="checkout-pay-button"
-              className="flex w-full items-center justify-center gap-3 bg-[#0D0D0D] px-4 py-5 font-mono text-xs leading-relaxed font-bold tracking-[0.25em] text-white transition-colors duration-300 hover:bg-[#FFE600] hover:text-black disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-[#0D0D0D] disabled:hover:text-white"
-            >
-              {paying ? c.paying : selected?.pickup && !pickup ? c.boxChoose : `${c.pay} ${money(total)}`}
-              <Lock className="h-3.5 w-3.5" />
-            </motion.button>
-            <p className="mt-4 text-center text-[11px] leading-relaxed text-balance text-zinc-500">
-              {c.agree}{" "}
-              <Link to="/legal/terms" className="underline underline-offset-2 hover:text-black">{c.terms}</Link> {c.and}{" "}
-              <Link to="/legal/privacy" className="underline underline-offset-2 hover:text-black">{c.privacy}</Link>. {c.secure}
-            </p>
-          </div>
-        </form>
-
-        <aside className="h-fit bg-[#F4F4F0] p-6 lg:sticky lg:top-28" data-testid="checkout-summary">
+        <div className="flex h-fit flex-col gap-6">
+        <aside className="h-fit bg-[#E8E8E8] p-6" data-testid="checkout-summary">
           <p className="mb-5 font-mono text-xs font-bold tracking-[0.25em]">{c.summary}</p>
           <ul className="divide-y divide-zinc-200">
             {summaryLines.map((l) => (
               <li key={l.key} className="flex gap-4 py-3">
-                <div className="relative h-16 w-12 shrink-0 bg-white">
-                  {l.image && <img src={l.image} alt={l.productTitle} className="h-full w-full object-cover" />}
+                <div className="bg-wino-photo relative h-16 w-12 shrink-0">
+                  {l.image && <img src={sizedImage(l.image, 200)} alt={l.productTitle} className="product-photo h-full w-full object-cover" />}
                   <span className="absolute -top-2 -right-2 flex h-5 min-w-5 items-center justify-center bg-black px-1 font-mono text-[10px] font-bold text-white">{l.quantity}</span>
                 </div>
                 <div className="flex flex-1 items-start justify-between gap-2">
@@ -584,12 +693,14 @@ export default function CheckoutPage() {
             </div>
           </dl>
         </aside>
+        <CartUpsell title={c.upsell} className="border-2 border-black p-6" />
+        </div>
       </div>
 
       {mapOpen &&
         createPortal(
         <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/50 sm:p-6" data-lenis-prevent data-testid="checkout-pickup-map">
-          <div className="relative flex h-full w-full max-w-5xl flex-col bg-white sm:h-[85vh]">
+          <div className="relative flex h-full w-full max-w-5xl flex-col bg-[#E8E8E8] sm:h-[85vh]">
             <div className="flex items-center justify-between bg-[#0D0D0D] px-5 py-3 text-[#FAF9F6]">
               <p className="font-mono text-xs font-bold tracking-[0.25em]">{c.boxChoose}</p>
               <button type="button" onClick={() => setMapOpen(false)} className="p-1 hover:text-[#FFE600]" aria-label="Close">

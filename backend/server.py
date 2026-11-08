@@ -1,4 +1,5 @@
 import os
+import json
 import re
 import time
 import logging
@@ -56,7 +57,7 @@ query Products($first: Int!, $country: CountryCode!) @inContext(country: $countr
         title
         description
         tags
-        images(first: 4) { edges { node { url altText } } }
+        images(first: 50) { edges { node { url altText } } }
         options { name values }
         variants(first: 50) {
           edges {
@@ -329,13 +330,79 @@ async def root():
     return {"message": "WINORWINS API"}
 
 
+PRODUCT_SPECS_QUERY = """
+query ProductSpecs {
+  products(first: 50) {
+    nodes {
+      handle
+      metafields(first: 40) {
+        nodes {
+          type
+          value
+          definition { name }
+          reference { ... on Metaobject { displayName } }
+          references(first: 10) { nodes { ... on Metaobject { displayName } } }
+        }
+      }
+    }
+  }
+}
+"""
+SPECS_TTL = 300
+_specs_cache = {"at": None, "data": {}}
+
+
+def _rich_text(node: dict) -> str:
+    if node.get("type") == "text":
+        return node.get("value") or ""
+    return "".join(_rich_text(child) for child in node.get("children") or [])
+
+
+def _metafield_text(field: dict) -> str:
+    """A Shopify metafield as display text; types with no sensible text form (colours, files, booleans) give ''."""
+    kind, value = field["type"], field.get("value") or ""
+    if kind.endswith("metaobject_reference"):
+        names = [n.get("displayName") for n in ((field.get("references") or {}).get("nodes") or [])]
+        names.append((field.get("reference") or {}).get("displayName"))
+        return ", ".join(n for n in names if n)
+    try:
+        if kind == "rich_text_field":
+            return _rich_text(json.loads(value)).strip()
+        if kind.startswith("list.") and kind.split(".", 1)[1] in ("single_line_text_field", "multi_line_text_field", "number_integer", "number_decimal"):
+            return ", ".join(str(v) for v in json.loads(value))
+        if kind in ("weight", "dimension", "volume"):
+            measure = json.loads(value)
+            return f"{measure['value']:g} {measure['unit'].lower()}"
+    except (ValueError, KeyError, TypeError):
+        return ""
+    return value if kind in ("single_line_text_field", "multi_line_text_field", "number_integer", "number_decimal", "date") else ""
+
+
+async def _product_specs() -> dict:
+    """Each product's own metafields by handle, from the Admin API; only fields with a definition, which leaves out apps' internal data."""
+    if _specs_cache["at"] is not None and time.monotonic() - _specs_cache["at"] < SPECS_TTL:
+        return _specs_cache["data"]
+    try:
+        data = await admin_query(PRODUCT_SPECS_QUERY)
+    except ShopifyError:
+        data = None  # Specs are optional: the shop keeps working without them, and this retries after the TTL.
+    specs = {}
+    for product in (data or {}).get("products", {}).get("nodes", []):
+        rows = [{"label": f["definition"]["name"], "value": _metafield_text(f)} for f in product["metafields"]["nodes"] if f.get("definition")]
+        # Shopify returns them in no fixed order: longer texts first, then alphabetically, the same on every product.
+        specs[product["handle"]] = sorted((r for r in rows if r["value"]), key=lambda r: ("\n" not in r["value"], r["label"]))
+    _specs_cache.update(at=time.monotonic(), data=specs)
+    return specs
+
+
 @api_router.get("/products")
 async def list_products(currency: Currency = "CZK"):
     try:
         data = await storefront_query(PRODUCTS_QUERY, {"first": 50, "country": CURRENCY_COUNTRY[currency]})
     except ShopifyError:
         raise HTTPException(status_code=502, detail="shopify_unavailable")
-    return [_map_product(e["node"]) for e in data["products"]["edges"]]
+    specs = await _product_specs()
+    return [{**_map_product(e["node"]), "specs": specs.get(e["node"]["handle"], [])} for e in data["products"]["edges"]]
 
 
 @api_router.get("/cart")

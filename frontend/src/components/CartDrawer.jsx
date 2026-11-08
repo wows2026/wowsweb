@@ -4,7 +4,8 @@ import { X, Minus, Plus, ShoppingBag, Lock } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/i18n";
-import { useCart, formatPrice } from "@/shop";
+import { useCart, formatPrice, sizedImage } from "@/shop";
+import { QuestTimer, CartUpsell } from "@/components/CheckoutExtras";
 
 export default function CartDrawer() {
   const { t, lang } = useLanguage();
@@ -54,7 +55,7 @@ export default function CartDrawer() {
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-            className="fixed top-0 right-0 z-[96] flex h-full w-full max-w-md flex-col bg-[#FAF9F6]"
+            className="fixed top-0 right-0 z-[96] flex h-full w-full max-w-md flex-col bg-[#E8E8E8]"
             data-testid="cart-drawer"
           >
             <div className="flex items-center justify-between bg-[#0D0D0D] px-5 py-4 text-[#FAF9F6]">
@@ -71,7 +72,9 @@ export default function CartDrawer() {
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto px-5 py-4">
+            {lines.length > 0 && <QuestTimer />}
+
+            <div className="flex-1 overflow-y-auto px-5 py-4" data-lenis-prevent data-testid="cart-scroll">
               {lines.length === 0 ? (
                 <div className="flex h-full flex-col items-center justify-center gap-4 text-zinc-400" data-testid="cart-empty">
                   <ShoppingBag className="h-10 w-10" strokeWidth={1.2} />
@@ -81,8 +84,8 @@ export default function CartDrawer() {
                 <ul className="divide-y divide-zinc-200">
                   {lines.map((l) => (
                     <li key={l.id} className="flex gap-4 py-4" data-testid={`cart-line-${l.id.split("/").pop().split("?")[0]}`}>
-                      <div className="h-20 w-16 shrink-0 overflow-hidden bg-[#F4F4F0]">
-                        {l.image && <img src={l.image} alt={l.productTitle} className="h-full w-full object-cover" />}
+                      <div className="bg-wino-photo h-20 w-16 shrink-0 overflow-hidden">
+                        {l.image && <img src={sizedImage(l.image, 200)} alt={l.productTitle} className="product-photo h-full w-full object-cover" />}
                       </div>
                       <div className="flex flex-1 flex-col">
                         <div className="flex items-start justify-between gap-2">
@@ -130,6 +133,7 @@ export default function CartDrawer() {
                   ))}
                 </ul>
               )}
+              {lines.length > 0 && <CartUpsell title={t.product.similar} className="mt-4 border-t-2 border-black pt-5" />}
             </div>
 
             {lines.length > 0 && (

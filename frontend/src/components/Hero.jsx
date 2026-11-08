@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowDown, ArrowUpRight } from "lucide-react";
 import { useLanguage } from "@/i18n";
@@ -12,13 +12,24 @@ const lineReveal = {
   visible: (i) => ({
     y: "0%",
     rotate: 0,
-    transition: { delay: 0.4 + i * 0.14, duration: 1, ease: [0.16, 1, 0.3, 1] },
+    transition: { delay: 0.1 + i * 0.07, duration: 0.5, ease: [0.16, 1, 0.3, 1] },
   }),
 };
 
 export default function Hero() {
   const { t } = useLanguage();
   const ref = useRef(null);
+  // The 5 MB video starts only after the page has loaded, so it can't hold up the first paint.
+  const [videoSrc, setVideoSrc] = useState();
+  useEffect(() => {
+    const start = () => setVideoSrc(HERO_VIDEO);
+    if (document.readyState === "complete") {
+      const id = setTimeout(start, 200);
+      return () => clearTimeout(id);
+    }
+    window.addEventListener("load", start, { once: true });
+    return () => window.removeEventListener("load", start);
+  }, []);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
   const videoY = useTransform(scrollYProgress, [0, 1], ["0%", "22%"]);
   const videoScale = useTransform(scrollYProgress, [0, 1], [1, 1.12]);
@@ -29,21 +40,21 @@ export default function Hero() {
       ref={ref}
       id="top"
       data-testid="hero-section"
-      className="relative h-[100svh] min-h-[620px] overflow-hidden bg-[#FAF9F6]"
+      className="relative h-[100svh] min-h-[620px] overflow-hidden bg-[#E8E8E8]"
     >
       <motion.div style={{ y: videoY, scale: videoScale }} className="absolute inset-0">
         <video
           data-testid="hero-video"
           className="h-full w-full object-cover"
-          src={HERO_VIDEO}
+          src={videoSrc}
           poster={HERO_POSTER}
           autoPlay
           muted
           loop
           playsInline
-          preload="auto"
+          preload="metadata"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-white/70 via-white/25 to-[#FAF9F6]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-white/70 via-white/25 to-[#E8E8E8]" />
       </motion.div>
 
       <motion.div
@@ -62,7 +73,7 @@ export default function Hero() {
           <motion.span
             initial={{ opacity: 0, y: 22 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.62, duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ delay: 0.2, duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
             className="mt-1 block"
           >
             {t.hero.line2}{" "}
@@ -88,7 +99,7 @@ export default function Hero() {
                   transform="rotate(-2 110 45)"
                   initial={{ pathLength: 0 }}
                   animate={{ pathLength: 1 }}
-                  transition={{ delay: 1.5, duration: 0.8, ease: "easeInOut" }}
+                  transition={{ delay: 0.5, duration: 0.4, ease: "easeInOut" }}
                 />
                 <motion.ellipse
                   cx="110"
@@ -101,7 +112,7 @@ export default function Hero() {
                   transform="rotate(1.4 110 45)"
                   initial={{ pathLength: 0 }}
                   animate={{ pathLength: 1 }}
-                  transition={{ delay: 1.7, duration: 0.8, ease: "easeInOut" }}
+                  transition={{ delay: 0.6, duration: 0.4, ease: "easeInOut" }}
                 />
               </motion.svg>
             </span>
@@ -111,22 +122,22 @@ export default function Hero() {
         <motion.button
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.0, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ delay: 0.35, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.97 }}
           data-testid="hero-cta-button"
           onClick={() => scrollToSection("#collection")}
-          className="group mt-9 flex w-fit items-center gap-3 whitespace-nowrap bg-[#0D0D0D] px-7 py-4 font-mono text-xs font-bold tracking-[0.2em] text-white transition-colors duration-300 hover:bg-[#FFE600] hover:text-black"
+          className="group mt-9 flex w-fit items-center gap-4 whitespace-nowrap bg-[#0D0D0D] px-9 py-6 font-mono text-[11px] font-bold tracking-[0.2em] sm:px-14 sm:py-8 sm:text-xs text-white transition-colors duration-300 hover:bg-[#FFE600] hover:text-black"
         >
           {t.hero.cta}
-          <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:rotate-45" />
+          <ArrowUpRight className="h-5 w-5 transition-transform duration-300 group-hover:rotate-45 sm:h-6 sm:w-6" />
         </motion.button>
       </motion.div>
 
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 1.3, duration: 0.8 }}
+        transition={{ delay: 0.5, duration: 0.4 }}
         style={{ opacity: fade }}
         className="absolute inset-x-0 bottom-0 flex items-center justify-center border-t border-zinc-900/10 px-5 py-4 font-mono text-[10px] tracking-[0.2em] text-zinc-600 sm:px-8"
         data-testid="hero-meta-bar"

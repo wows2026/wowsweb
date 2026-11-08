@@ -33,6 +33,8 @@ export default function CheckoutReturnPage() {
           clearCart();
           try {
             sessionStorage.removeItem("wino_checkout_form");
+            sessionStorage.removeItem("wino_checkout_step");
+            sessionStorage.removeItem("wino_checkout_deadline");
           } catch {}
           return;
         }

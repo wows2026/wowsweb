@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import Lenis from "lenis";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { Toaster } from "sonner";
@@ -7,36 +7,19 @@ import "@/App.css";
 import { LanguageProvider } from "@/i18n";
 import { CartProvider } from "@/shop";
 import Navbar from "@/components/Navbar";
-import Hero from "@/components/Hero";
-import Marquee from "@/components/Marquee";
-import FeaturedProducts from "@/components/FeaturedProducts";
-import Lookbook from "@/components/Lookbook";
-import Social from "@/components/Social";
-import Newsletter from "@/components/Newsletter";
 import Footer from "@/components/Footer";
 import CartDrawer from "@/components/CartDrawer";
 import LockScreen from "@/components/LockScreen";
-import CollectionPage from "@/pages/CollectionPage";
-import ProductPage from "@/pages/ProductPage";
-import LookbookPage from "@/pages/LookbookPage";
-import SocialsPage from "@/pages/SocialsPage";
-import ContactPage from "@/pages/ContactPage";
-import LegalPage from "@/pages/LegalPage";
-import CheckoutPage from "@/pages/CheckoutPage";
-import CheckoutReturnPage from "@/pages/CheckoutReturnPage";
 
-function Landing() {
-  return (
-    <main>
-      <Hero />
-      <Marquee />
-      <FeaturedProducts />
-      <Lookbook />
-      <Social />
-      <Newsletter />
-    </main>
-  );
-}
+const Landing = lazy(() => import("@/pages/Landing"));
+const CollectionPage = lazy(() => import("@/pages/CollectionPage"));
+const ProductPage = lazy(() => import("@/pages/ProductPage"));
+const LookbookPage = lazy(() => import("@/pages/LookbookPage"));
+const SocialsPage = lazy(() => import("@/pages/SocialsPage"));
+const ContactPage = lazy(() => import("@/pages/ContactPage"));
+const LegalPage = lazy(() => import("@/pages/LegalPage"));
+const CheckoutPage = lazy(() => import("@/pages/CheckoutPage"));
+const CheckoutReturnPage = lazy(() => import("@/pages/CheckoutReturnPage"));
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -48,17 +31,64 @@ function ScrollToTop() {
 }
 
 // Legal pages stay readable while the site is locked (the lock screen links to the privacy policy).
-function SiteLock({ unlocked, onUnlock }) {
-  const { pathname } = useLocation();
-  const locked = !unlocked && !pathname.startsWith("/legal/");
-
+function SiteLock({ locked, onUnlock }) {
   useEffect(() => {
+    // Rubber-band overscroll on phones shows the page background behind the lock screen.
+    document.documentElement.style.backgroundColor = locked ? "#FFE600" : "";
     if (!window.__lenis) return;
     if (locked) window.__lenis.stop();
     else window.__lenis.start();
   }, [locked]);
 
   return <AnimatePresence>{locked && <LockScreen onUnlock={onUnlock} />}</AnimatePresence>;
+}
+
+// While locked the site isn't rendered at all, so there is nothing to scroll to behind the lock screen.
+function Site({ unlocked, onUnlock }) {
+  const { pathname } = useLocation();
+  const locked = !unlocked && !pathname.startsWith("/legal/");
+
+  return (
+    <div className="min-h-screen bg-[#E8E8E8] font-sans text-[#0D0D0D] antialiased">
+      <div className="grain" aria-hidden="true" />
+      <SiteLock locked={locked} onUnlock={onUnlock} />
+      {!locked && (
+        <>
+          <Navbar />
+          <Suspense fallback={<div className="min-h-screen" />}>
+            <Routes>
+              <Route path="/" element={<Landing />} />
+              <Route path="/collection" element={<CollectionPage />} />
+              <Route path="/product/:handle" element={<ProductPage />} />
+              <Route path="/lookbook" element={<LookbookPage />} />
+              <Route path="/socials" element={<SocialsPage />} />
+              <Route path="/contact" element={<ContactPage />} />
+              <Route path="/legal/:slug" element={<LegalPage />} />
+              <Route path="/checkout" element={<CheckoutPage />} />
+              <Route path="/checkout/return" element={<CheckoutReturnPage />} />
+              <Route path="*" element={<Landing />} />
+            </Routes>
+          </Suspense>
+          <Footer />
+          <CartDrawer />
+        </>
+      )}
+      <Toaster
+        position="bottom-center"
+        toastOptions={{
+          style: {
+            background: "#0D0D0D",
+            color: "#FAF9F6",
+            border: "1px solid #FFE600",
+            borderRadius: 0,
+            fontFamily: '"Helvetica Now Display", "Helvetica Neue", Helvetica, Arial, sans-serif',
+            fontSize: "12px",
+            letterSpacing: "0.05em",
+          },
+        }}
+      />
+    </div>
+  );
 }
 
 export default function App() {
@@ -94,39 +124,7 @@ export default function App() {
       <CartProvider>
         <BrowserRouter>
           <ScrollToTop />
-          <div className="min-h-screen bg-[#FAF9F6] font-sans text-[#0D0D0D] antialiased">
-            <div className="grain" aria-hidden="true" />
-            <SiteLock unlocked={unlocked} onUnlock={() => setUnlocked(true)} />
-            <Navbar />
-            <Routes>
-              <Route path="/" element={<Landing />} />
-              <Route path="/collection" element={<CollectionPage />} />
-              <Route path="/product/:handle" element={<ProductPage />} />
-              <Route path="/lookbook" element={<LookbookPage />} />
-              <Route path="/socials" element={<SocialsPage />} />
-              <Route path="/contact" element={<ContactPage />} />
-              <Route path="/legal/:slug" element={<LegalPage />} />
-              <Route path="/checkout" element={<CheckoutPage />} />
-              <Route path="/checkout/return" element={<CheckoutReturnPage />} />
-              <Route path="*" element={<Landing />} />
-            </Routes>
-            <Footer />
-            <CartDrawer />
-            <Toaster
-              position="bottom-center"
-              toastOptions={{
-                style: {
-                  background: "#0D0D0D",
-                  color: "#FAF9F6",
-                  border: "1px solid #FFE600",
-                  borderRadius: 0,
-                  fontFamily: '"Helvetica Now Display", "Helvetica Neue", Helvetica, Arial, sans-serif',
-                  fontSize: "12px",
-                  letterSpacing: "0.05em",
-                },
-              }}
-            />
-          </div>
+          <Site unlocked={unlocked} onUnlock={() => setUnlocked(true)} />
         </BrowserRouter>
       </CartProvider>
     </LanguageProvider>

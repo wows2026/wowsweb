@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
 import { useLanguage } from "@/i18n";
-import { useCart, formatPrice } from "@/shop";
+import { useCart, formatPrice, sizedImage } from "@/shop";
 
 export const cardReveal = {
   hidden: { opacity: 0, y: 40 },
@@ -45,22 +45,22 @@ export default function ProductCard({ p, i = 0 }) {
       data-testid={`product-card-${p.handle}`}
       className="group block"
     >
-      <div className="relative aspect-[3/4] overflow-hidden bg-[#F4F4F0]">
+      <div className="bg-wino-photo relative aspect-[3/4] overflow-hidden">
         <Link to={`/product/${p.handle}`} data-testid={`product-link-${p.handle}`} className="absolute inset-0 z-[5]" aria-label={p.name} />
         {p.images.main && (
           <img
-            src={p.images.main}
+            src={sizedImage(p.images.main, 800)}
             alt={p.name}
             loading="lazy"
-            className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ${p.images.hover && p.images.hover !== p.images.main ? "group-hover:opacity-0" : ""}`}
+            className={`product-photo absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ${p.images.hover && p.images.hover !== p.images.main ? "group-hover:opacity-0" : ""}`}
           />
         )}
         {p.images.hover && p.images.hover !== p.images.main && (
           <img
-            src={p.images.hover}
+            src={sizedImage(p.images.hover, 800)}
             alt={`${p.name} alternate`}
             loading="lazy"
-            className="absolute inset-0 h-full w-full scale-[1.03] object-cover opacity-0 transition-[opacity,transform] duration-500 group-hover:scale-100 group-hover:opacity-100"
+            className="product-photo absolute inset-0 h-full w-full scale-[1.03] object-cover opacity-0 transition-[opacity,transform] duration-500 group-hover:scale-100 group-hover:opacity-100"
           />
         )}
         {p.badge && (
@@ -82,13 +82,13 @@ export default function ProductCard({ p, i = 0 }) {
             disabled={busy}
             data-testid={`product-add-${p.handle}`}
             aria-label={`Add ${p.name} to cart`}
-            className="absolute right-2.5 bottom-2.5 z-10 flex h-8 w-8 translate-y-1 items-center justify-center rounded-full bg-white text-black opacity-0 shadow-sm transition-[opacity,transform] duration-300 group-hover:translate-y-0 group-hover:opacity-100 disabled:opacity-40"
+            className="absolute right-2.5 bottom-2.5 z-10 flex h-8 w-8 translate-y-1 items-center justify-center rounded-full bg-[#E8E8E8] text-black opacity-0 shadow-sm transition-[opacity,transform] duration-300 group-hover:translate-y-0 group-hover:opacity-100 disabled:opacity-40"
           >
             <Plus className="h-4 w-4" />
           </button>
         )}
         {pickerOpen && (
-          <div className="absolute inset-x-0 bottom-0 z-20 flex flex-wrap gap-1.5 bg-white/95 p-2.5 backdrop-blur-sm" data-testid={`variant-picker-${p.handle}`}>
+          <div className="absolute inset-x-0 bottom-0 z-20 flex flex-wrap gap-1.5 bg-[#E8E8E8]/95 p-2.5 backdrop-blur-sm" data-testid={`variant-picker-${p.handle}`}>
             {p.variants.map((v) => (
               <button
                 key={v.id}

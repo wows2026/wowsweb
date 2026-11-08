@@ -14,7 +14,7 @@ export default function Lookbook() {
       id="lookbook"
       ref={ref}
       data-testid="lookbook-section"
-      className="border-y border-zinc-200 bg-[#F4F4F0] px-5 py-20 sm:px-8 sm:py-28"
+      className="border-y border-zinc-200 bg-[#E8E8E8] px-5 py-20 sm:px-8 sm:py-28"
     >
       <div className="mb-14 max-w-3xl">
         <MaskedTitle
@@ -23,16 +23,6 @@ export default function Lookbook() {
         >
           {t.lookbook.title}
         </MaskedTitle>
-        <motion.p
-          initial={{ opacity: 0, y: 14 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.25, duration: 0.7 }}
-          className="mt-5 max-w-md text-sm leading-relaxed text-zinc-600 sm:text-base"
-          data-testid="lookbook-text"
-        >
-          {t.lookbook.text}
-        </motion.p>
       </div>
 
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
@@ -45,7 +35,7 @@ export default function Lookbook() {
                 loading="lazy"
                 className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
               />
-              <span className="absolute bottom-3 left-3 bg-[#FAF9F6]/90 px-2.5 py-1 font-mono text-[10px] font-bold tracking-[0.2em] backdrop-blur-sm">
+              <span className="absolute bottom-3 left-3 bg-[#E8E8E8]/90 px-2.5 py-1 font-mono text-[10px] font-bold tracking-[0.2em] backdrop-blur-sm">
                 {String(i + 1).padStart(2, "0")} / 03
               </span>
             </div>
