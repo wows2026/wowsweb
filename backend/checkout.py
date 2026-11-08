@@ -10,7 +10,6 @@ import re
 import time
 import secrets
 import logging
-import unicodedata
 from datetime import datetime, timezone
 from decimal import Decimal, ROUND_HALF_UP
 from html import escape
@@ -35,10 +34,14 @@ PHONE_RE = re.compile(r"^\+?[0-9 ()-]{6,20}$")
 # Shopify rates named like "DPD – box" / "DPD Pickup" deliver to a point the customer picks on DPD's map.
 PICKUP_RE = re.compile(r"box|pickup|výdejn", re.I)
 DPD_PICKUP_URL = "https://api.dpd.cz/api/v1/pickup-points/{}"
-MAPY_SUGGEST_URL = "https://api.mapy.com/v1/suggest"
-# Result language per delivery country, so city names come out the way the courier expects them.
-CITY_IN_QUERY = re.compile(r"^(.*?\d\S*)[,\s]+(\D{2,})$")
-MAPY_LANG = {"CZ": "cs", "SK": "sk", "DE": "de", "AT": "de", "FR": "fr", "ES": "es", "IT": "it", "NL": "nl", "PL": "pl", "PT": "pt", "GR": "el"}
+PLACES_URL = "https://places.googleapis.com/v1/places"
+PLACE_TYPES = ["street_address", "premise", "subpremise", "route"]
+PLACE_ID_RE = re.compile(r"^[\w-]{10,400}$")
+ADDRESS_SESSION_RE = re.compile(r"^[\w-]{1,36}$")
+# Language per delivery country, so city names come out the way the courier expects them.
+ADDRESS_LANG = {"CZ": "cs", "SK": "sk", "DE": "de", "AT": "de", "FR": "fr", "ES": "es", "IT": "it", "NL": "nl", "PL": "pl", "PT": "pt", "GR": "el"}
+# Countries that write the house number before the street.
+NUMBER_FIRST = {"FR", "IE", "LU"}
 
 CHECKOUT_FRAGMENT = """
 fragment CheckoutCart on Cart {
@@ -275,61 +278,90 @@ def _summary(cart: dict) -> dict:
     }
 
 
-def _mapy_address(item: dict, country: str) -> Optional[dict]:
-    """A Mapy.com suggestion as checkout form fields; None when it lies outside the delivery country."""
-    regions = item.get("regionalStructure") or []
-    iso = next((r.get("isoCode") for r in regions if r.get("isoCode")), None)
-    if iso and iso.upper() != country:
-        return None
-    city = next((r.get("name") for r in regions if r.get("type") == "regional.municipality"), "")
-    return {"address1": item.get("name") or "", "city": city or "", "zip": item.get("zip") or "", "label": item.get("location") or item.get("name") or ""}
+def _place_city(parts: dict) -> str:
+    """Big Czech and Slovak cities come without a locality, only as districts: "Hlavní město Praha", "Plzeň-město", "Bratislava I"."""
+    city = parts.get("locality") or parts.get("postal_town")
+    if city:
+        return city
+    area = parts.get("administrative_area_level_2", "")
+    if area.startswith("Hlavní město "):
+        return area[len("Hlavní město "):]
+    if area.endswith("-město"):
+        return area[:-len("-město")]
+    return re.sub(r"\s+[IVX]+$", "", area) or parts.get("sublocality", "")
 
 
-def _fold(text: str) -> str:
-    return "".join(ch for ch in unicodedata.normalize("NFD", text.casefold()) if not unicodedata.combining(ch))
+def _place_address(place: dict, country: str) -> dict:
+    """A Google place as checkout form fields; hasNumber is False when the buyer picked a street without a house number."""
+    parts: dict = {}
+    for component in place.get("addressComponents") or []:
+        for kind in component.get("types") or []:
+            parts.setdefault(kind, component.get("longText") or "")
+    # Czech and Slovak addresses have two numbers: premise (č.p.) / street_number (č.o.). A premise can also be a building name.
+    premise = parts.get("premise", "") if re.match(r"\d", parts.get("premise", "")) else ""
+    number = "/".join(n for n in (premise, parts.get("street_number", "")) if n)
+    city = _place_city(parts)
+    # Villages without named streets: "Lhota 25".
+    street = parts.get("route") or parts.get("neighborhood") or parts.get("sublocality") or city
+    address1 = " ".join(x for x in ((number, street) if country in NUMBER_FIRST else (street, number)) if x)
+    return {"address1": address1, "city": city, "zip": parts.get("postal_code", ""), "hasNumber": bool(number)}
 
 
-def _rank_addresses(addresses: list, query: str) -> list:
-    """Mapy.com matches the street first and may ignore a typed city or number, so best overlap with the query goes on top."""
-    terms = _fold(query).replace(",", " ").split()
-
-    def score(a: dict) -> int:
-        words = set(re.split(r"[\s/,-]+", _fold(f"{a['address1']} {a['zip']} {a['city']}")))
-        # An exact word (house number, city) beats a street name that merely starts with what was typed.
-        return sum(2 if t in words else 1 if any(w.startswith(t) for w in words) else 0 for t in terms)
-
-    unique = {(a["address1"], a["zip"], a["city"]): a for a in reversed(addresses)}
-    return sorted(reversed(list(unique.values())), key=score, reverse=True)[:5]
+def _places_key() -> Optional[str]:
+    return os.environ.get("GOOGLE_PLACES_API_KEY")
 
 
-async def _suggest_addresses(query: str, country: str) -> list:
-    """Autocomplete is a convenience: without a key or when Mapy.com fails the buyer just types the address."""
-    key = os.environ.get("MAPY_API_KEY")
+async def _suggest_addresses(query: str, country: str, session: str) -> list:
+    """Autocomplete is a convenience: without a key or when Google fails the buyer just types the address."""
+    key = _places_key()
     query = query.strip()
-    if not key or not 3 <= len(query) <= 120 or not re.fullmatch(r"[A-Z]{2}", country):
+    if not key or not 3 <= len(query) <= 120 or not re.fullmatch(r"[A-Z]{2}", country) or not ADDRESS_SESSION_RE.match(session):
         return []
-    # "Husova 12 Plzeň": search the street inside the typed city, or common street names drown it out.
-    typed_city = CITY_IN_QUERY.match(query)
-    searches = [(typed_city[1], typed_city[2])] if typed_city else []
-    searches.append((query, country.lower()))
     try:
         async with httpx.AsyncClient(timeout=4) as client:
-            for text, locality in searches:
-                resp = await client.get(
-                    MAPY_SUGGEST_URL,
-                    headers={"X-Mapy-Api-Key": key},
-                    params={"query": text, "type": "regional.address", "locality": locality, "limit": 15, "lang": MAPY_LANG.get(country, "en")},
-                )
-                if resp.status_code != 200:
-                    logger.warning("Mapy.com suggest returned %s", resp.status_code)
-                    return []
-                addresses = [a for a in (_mapy_address(i, country) for i in resp.json().get("items") or []) if a and a["address1"]]
-                if addresses:
-                    return _rank_addresses(addresses, query)
-        return []
+            resp = await client.post(
+                f"{PLACES_URL}:autocomplete",
+                headers={"X-Goog-Api-Key": key},
+                json={"input": query, "includedPrimaryTypes": PLACE_TYPES, "includedRegionCodes": [country.lower()], "regionCode": country.lower(),
+                      "languageCode": ADDRESS_LANG.get(country, "en"), "sessionToken": session},
+            )
+        if resp.status_code != 200:
+            logger.warning("Google autocomplete returned %s", resp.status_code)
+            return []
+        items, streets = [], []
+        for suggestion in resp.json().get("suggestions") or []:
+            place = suggestion.get("placePrediction") or {}
+            structured = place.get("structuredFormat") or {}
+            main = (structured.get("mainText") or {}).get("text") or (place.get("text") or {}).get("text")
+            if place.get("placeId") and main:
+                item = {"placeId": place["placeId"], "main": main, "secondary": (structured.get("secondaryText") or {}).get("text") or ""}
+                (streets if "route" in (place.get("types") or []) else items).append(item)
+        # Once a house number is typed, the exact address goes above the bare street.
+        return items + streets if re.search(r"\d", query) else streets + items
     except (httpx.HTTPError, ValueError) as e:
-        logger.warning("Mapy.com suggest failed: %s", type(e).__name__)
+        logger.warning("Google autocomplete failed: %s", type(e).__name__)
         return []
+
+
+async def _address_details(place_id: str, country: str, session: str) -> Optional[dict]:
+    key = _places_key()
+    if not key or not PLACE_ID_RE.match(place_id) or not re.fullmatch(r"[A-Z]{2}", country) or not ADDRESS_SESSION_RE.match(session):
+        return None
+    try:
+        async with httpx.AsyncClient(timeout=4) as client:
+            resp = await client.get(
+                f"{PLACES_URL}/{place_id}",
+                # Only address fields: anything more moves the request to a dearer billing tier.
+                headers={"X-Goog-Api-Key": key, "X-Goog-FieldMask": "addressComponents"},
+                params={"sessionToken": session, "languageCode": ADDRESS_LANG.get(country, "en"), "regionCode": country.lower()},
+            )
+        if resp.status_code != 200:
+            logger.warning("Google place details returned %s", resp.status_code)
+            return None
+        return _place_address(resp.json(), country)
+    except (httpx.HTTPError, ValueError) as e:
+        logger.warning("Google place details failed: %s", type(e).__name__)
+        return None
 
 
 async def _dpd_point(point: "PickupPoint") -> dict:
@@ -397,8 +429,12 @@ def build_router(db, send_email) -> APIRouter:
         return res["cart"]
 
     @router.get("/address-suggest")
-    async def address_suggest(q: str = "", country: str = ""):
-        return {"items": await _suggest_addresses(q, country.strip().upper())}
+    async def address_suggest(q: str = "", country: str = "", session: str = ""):
+        return {"items": await _suggest_addresses(q, country.strip().upper(), session)}
+
+    @router.get("/address-details")
+    async def address_details(place_id: str = "", country: str = "", session: str = ""):
+        return {"address": await _address_details(place_id, country.strip().upper(), session)}
 
     @router.post("/shipping")
     async def shipping_options(input: CheckoutAddress):

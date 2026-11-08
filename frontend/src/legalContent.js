@@ -819,7 +819,7 @@ export const LEGAL_DOCS = {
       },
       {
         "type": "li",
-        "text": "služba pro našeptávání adres v pokladně: Mapy.com (Seznam.cz, a.s.), předáváme jí jen text adresy, který píšete do pole,"
+        "text": "služba pro našeptávání adres v pokladně: Google Maps Platform (Google), předáváme jí jen text adresy, který píšete do pole,"
       },
       {
         "type": "li",
@@ -843,7 +843,7 @@ export const LEGAL_DOCS = {
       },
       {
         "type": "p",
-        "text": "Někteří naši dodavatelé (Shopify, Emergent) mohou údaje zpracovávat mimo EU. Předání probíhá na základě rozhodnutí Evropské komise o odpovídající ochraně (např. EU–US Data Privacy Framework) nebo standardních smluvních doložek."
+        "text": "Někteří naši dodavatelé (Shopify, Emergent, Google) mohou údaje zpracovávat mimo EU. Předání probíhá na základě rozhodnutí Evropské komise o odpovídající ochraně (např. EU–US Data Privacy Framework) nebo standardních smluvních doložek."
       },
       {
         "type": "h2",

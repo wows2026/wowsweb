@@ -17,6 +17,7 @@ const DIAL_CODES = {
   CH: "41", GB: "44", NO: "47", UA: "380", US: "1", VN: "84",
 };
 const FORM_KEY = "wino_checkout_form";
+const NAVBAR_HEIGHT = 90;
 const DPD_WIDGET = "https://api.dpd.cz/widget/latest/index.html";
 
 const labelCls = "mb-2 block font-mono text-[10px] font-bold tracking-[0.25em] text-zinc-500";
@@ -96,23 +97,41 @@ function PhoneField({ label, codeLabel, lang, form, setForm }) {
   );
 }
 
+// Groups a buyer's keystrokes and the final pick into one billed Google session.
+const newAddressSession = () => window.crypto.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2, 14)}`;
+
 // Street field with address suggestions; picking one fills in the street, number, city and postal code.
-function AddressField({ label, placeholder, country, value, onType, onPick }) {
+function AddressField({ label, placeholder, noMatch, country, value, onType, onPick }) {
   const [items, setItems] = useState([]);
   const [active, setActive] = useState(-1);
+  const [notFound, setNotFound] = useState(false);
   const timer = useRef(null);
   const seq = useRef(0);
   const input = useRef(null);
+  const list = useRef(null);
+  const session = useRef(newAddressSession());
 
   const close = () => {
     clearTimeout(timer.current);
     seq.current++;
     setItems([]);
     setActive(-1);
+    setNotFound(false);
   };
 
   useEffect(() => () => clearTimeout(timer.current), []);
   useEffect(close, [country]);
+
+  // The field sits low on the page, so the list can open below the fold or under a phone keyboard.
+  const opened = items.length > 0 || notFound;
+  useEffect(() => {
+    if (!opened || !list.current) return;
+    const vv = window.visualViewport;
+    const visibleBottom = vv ? vv.offsetTop + vv.height : window.innerHeight;
+    const overflow = list.current.getBoundingClientRect().bottom - visibleBottom + 8;
+    const room = input.current.getBoundingClientRect().top - NAVBAR_HEIGHT;
+    if (overflow > 0 && room > 0) window.scrollBy(0, Math.min(overflow, room));
+  }, [opened]);
 
   const onChange = (e) => {
     const q = e.target.value;
@@ -121,27 +140,44 @@ function AddressField({ label, placeholder, country, value, onType, onPick }) {
     const mine = ++seq.current;
     if (q.trim().length < 3) {
       setItems([]);
+      setNotFound(false);
       return;
     }
     timer.current = setTimeout(async () => {
       try {
-        const r = await axios.get(`${API}/checkout/address-suggest`, { params: { q, country } });
+        const r = await axios.get(`${API}/checkout/address-suggest`, { params: { q, country, session: session.current } });
         // Browser autofill also fires onChange; don't open a list on a field the buyer isn't in.
         if (mine !== seq.current || document.activeElement !== input.current) return;
         setItems(r.data.items);
         setActive(-1);
+        setNotFound(r.data.items.length === 0);
       } catch {
-        if (mine === seq.current) setItems([]);
+        if (mine === seq.current) {
+          setItems([]);
+          setNotFound(true);
+        }
       }
     }, 250);
   };
 
-  const pick = (item) => {
+  const pick = async (item) => {
     close();
-    onPick(item);
+    onType(item.main);
+    const finished = session.current;
+    session.current = newAddressSession();
+    try {
+      const { data } = await axios.get(`${API}/checkout/address-details`, { params: { place_id: item.placeId, country, session: finished } });
+      if (!data.address) return;
+      // A street without a house number: leave the cursor there so the buyer can add it.
+      onPick({ ...data.address, address1: data.address.address1 + (data.address.hasNumber ? "" : " ") });
+      if (!data.address.hasNumber) input.current?.focus();
+    } catch {
+      // The street stays in the field and the buyer fills in the rest.
+    }
   };
 
   const onKeyDown = (e) => {
+    if (e.key === "Escape") close();
     if (!items.length) return;
     if (e.key === "ArrowDown" || e.key === "ArrowUp") {
       e.preventDefault();
@@ -150,8 +186,6 @@ function AddressField({ label, placeholder, country, value, onType, onPick }) {
     } else if (e.key === "Enter" && active >= 0) {
       e.preventDefault();
       pick(items[active]);
-    } else if (e.key === "Escape") {
-      close();
     }
   };
 
@@ -178,10 +212,10 @@ function AddressField({ label, placeholder, country, value, onType, onPick }) {
         onBlur={close}
       />
       {items.length > 0 && (
-        <ul id="checkout-address-list" role="listbox" className="absolute top-full right-0 left-0 z-30 border-2 border-t-0 border-black bg-white" data-testid="checkout-address-list">
+        <ul ref={list} id="checkout-address-list" role="listbox" className="absolute top-full right-0 left-0 z-30 border-2 border-t-0 border-black bg-white" data-testid="checkout-address-list">
           {items.map((item, i) => (
             <li
-              key={`${item.label}-${i}`}
+              key={item.placeId}
               role="option"
               aria-selected={i === active}
               // Keep focus in the input so its blur doesn't close the list before the click lands.
@@ -193,15 +227,20 @@ function AddressField({ label, placeholder, country, value, onType, onPick }) {
             >
               <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0" />
               <span className="min-w-0">
-                <strong className="block font-semibold">{item.address1}</strong>
-                <span className="block text-xs text-zinc-600">{[item.zip, item.city].filter(Boolean).join(" ")}</span>
+                <strong className="block font-semibold">{item.main}</strong>
+                {item.secondary && <span className="block text-xs text-zinc-600">{item.secondary}</span>}
               </span>
             </li>
           ))}
-          <li role="presentation" className="px-3 py-1.5 text-right font-mono text-[9px] tracking-[0.15em] text-zinc-400">
-            MAPY.COM
+          <li role="presentation" translate="no" className="px-3 py-1.5 text-right text-xs font-normal text-[#5E5E5E]" style={{ fontFamily: "Roboto, sans-serif" }}>
+            Google Maps
           </li>
         </ul>
+      )}
+      {notFound && (
+        <p ref={list} role="status" className="absolute top-full right-0 left-0 z-30 border-2 border-t-0 border-black bg-white px-3 py-3 text-xs text-zinc-600" data-testid="checkout-address-none">
+          {noMatch}
+        </p>
       )}
     </div>
   );
@@ -414,6 +453,7 @@ export default function CheckoutPage() {
               <AddressField
                 label={c.address1}
                 placeholder={c.addressPlaceholder}
+                noMatch={c.addressNone}
                 country={form.country}
                 value={form.address1}
                 onType={(address1) => setForm((f) => ({ ...f, address1 }))}
