@@ -4,8 +4,8 @@ import { ArrowDown, ArrowUpRight } from "lucide-react";
 import { useLanguage } from "@/i18n";
 import { scrollToSection } from "@/components/Navbar";
 
-const HERO_VIDEO = "https://assets.mixkit.co/videos/50639/50639-720.mp4";
-const HERO_POSTER = "/hero-poster.jpg";
+const HERO_VIDEO = "/hero.mp4";
+const HERO_POSTER = "/hero.jpg";
 
 const lineReveal = {
   hidden: { y: "115%", rotate: 2 },
@@ -19,7 +19,7 @@ const lineReveal = {
 export default function Hero() {
   const { t } = useLanguage();
   const ref = useRef(null);
-  // The 5 MB video starts only after the page has loaded, so it can't hold up the first paint.
+  // The video starts only after the page has loaded, so it can't hold up the first paint.
   const [videoSrc, setVideoSrc] = useState();
   useEffect(() => {
     const start = () => setVideoSrc(HERO_VIDEO);

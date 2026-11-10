@@ -607,12 +607,12 @@ export const LEGAL_DOCS = {
           [
             "DPD – doručení do boxu nebo na výdejní místo",
             "1–2 pracovní dny",
-            "79 Kč"
+            "89 Kč"
           ],
           [
             "DPD – doručení na adresu",
             "1–2 pracovní dny",
-            "89 Kč"
+            "99 Kč"
           ]
         ]
       },
@@ -641,7 +641,7 @@ export const LEGAL_DOCS = {
           ],
           [
             "Ostatní státy EU (kromě Kypru a Malty)",
-            "DPD – na adresu",
+            "DPD – na adresu, v některých zemích i do boxu",
             "3–7 pracovních dnů",
             "podle země, zobrazí se v pokladně"
           ]
@@ -998,6 +998,20 @@ export const LEGAL_DOCS = {
             "WINORWINS",
             "úložiště relace",
             "rozepsané údaje v pokladně",
+            "do zavření karty nebo dokončení objednávky"
+          ],
+          [
+            "wino_checkout_step",
+            "WINORWINS",
+            "úložiště relace",
+            "rozpracovaný krok pokladny",
+            "do zavření karty nebo dokončení objednávky"
+          ],
+          [
+            "wino_checkout_deadline",
+            "WINORWINS",
+            "úložiště relace",
+            "odpočet času na dokončení objednávky",
             "do zavření karty nebo dokončení objednávky"
           ],
           [

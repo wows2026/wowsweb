@@ -3,9 +3,10 @@ import Lenis from "lenis";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { Toaster } from "sonner";
 import { AnimatePresence } from "framer-motion";
+import axios from "axios";
 import "@/App.css";
 import { LanguageProvider } from "@/i18n";
-import { CartProvider } from "@/shop";
+import { API, CartProvider } from "@/shop";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CartDrawer from "@/components/CartDrawer";
@@ -43,10 +44,42 @@ function SiteLock({ locked, onUnlock }) {
   return <AnimatePresence>{locked && <LockScreen onUnlock={onUnlock} />}</AnimatePresence>;
 }
 
+// Drop time, Prague: 11. 11. 2026 11:11. The server's clock decides; the browser's clock is only the first guess.
+const DROP_AT = Date.parse("2026-11-11T11:11:00+01:00");
+const STATUS_POLL_MS = 30000;
+
+function useDropOpen() {
+  const [open, setOpen] = useState(() => Date.now() >= DROP_AT);
+  useEffect(() => {
+    let timer;
+    let alive = true;
+    const check = async () => {
+      try {
+        const { data } = await axios.get(`${API}/site/status`);
+        if (!alive) return;
+        setOpen(!data.locked);
+        if (!data.locked) return;
+      } catch {
+        if (!alive) return;
+        setOpen(Date.now() >= DROP_AT);
+      }
+      // Visitors waiting on the lock screen get the site at the drop without reloading.
+      timer = setTimeout(check, STATUS_POLL_MS);
+    };
+    check();
+    return () => {
+      alive = false;
+      clearTimeout(timer);
+    };
+  }, []);
+  return open;
+}
+
 // While locked the site isn't rendered at all, so there is nothing to scroll to behind the lock screen.
 function Site({ unlocked, onUnlock }) {
   const { pathname } = useLocation();
-  const locked = !unlocked && !pathname.startsWith("/legal/");
+  const open = useDropOpen();
+  const locked = !unlocked && !open && !pathname.startsWith("/legal/");
 
   return (
     <div className="min-h-screen bg-[#E8E8E8] font-sans text-[#0D0D0D] antialiased">

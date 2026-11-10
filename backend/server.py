@@ -9,6 +9,7 @@ from html.parser import HTMLParser
 from urllib.parse import urlparse
 from pathlib import Path
 from typing import Literal
+from datetime import datetime, timezone
 
 import httpx
 from dotenv import load_dotenv
@@ -744,6 +745,15 @@ async def waitlist_subscribe(input: WaitlistSubscribe, request: Request):
 
 class UnlockInput(BaseModel):
     password: str
+
+
+# The drop opens the site for everyone at this moment; before it, only the early-access password does.
+SITE_OPEN_AT = datetime.fromisoformat(os.environ.get("SITE_OPEN_AT", "2026-11-11T11:11:00+01:00"))
+
+
+@api_router.get("/site/status")
+async def site_status():
+    return {"locked": datetime.now(timezone.utc) < SITE_OPEN_AT, "opensAt": SITE_OPEN_AT.isoformat()}
 
 
 @api_router.post("/auth/unlock")
