@@ -3,7 +3,7 @@ import { createContext, useContext, useState } from "react";
 export const LOOKBOOK_IMAGES = [
   "/community/community-1.jpg",
   "/community/community-2.jpg",
-  "/community/community-3.jpg",
+  "/community/community-4.jpg",
 ];
 
 export const translations = {
@@ -139,18 +139,11 @@ export const translations = {
     },
     locked: {
       tagline: "DROP 001 — COMING SOON",
-      waitlist: "JOIN THE WAITLIST",
       days: "DAYS",
       hours: "HRS",
       minutes: "MIN",
       seconds: "SEC",
-      emailPlaceholder: "Email address",
-      notify: "SIGN UP",
-      subscribed: "YOU'RE IN. KEEP WINNING",
-      subscribedSub: "Early access + password will hit your inbox before the drop.",
-      consent: "Early access + password. Plus news on future releases. Unsubscribe anytime.",
       privacy: "Privacy Policy",
-      signupError: "SOMETHING WENT WRONG. TRY AGAIN.",
       enterPassword: "ENTER PASSWORD",
       passwordPlaceholder: "PASSWORD",
       unlock: "ENTER",
@@ -306,21 +299,14 @@ export const translations = {
     },
     locked: {
       tagline: "DROP 001 — JIŽ BRZY",
-      waitlist: "PŘIDEJ SE NA WAITLIST",
       days: "DNÍ",
       hours: "HOD",
       minutes: "MIN",
       seconds: "SEK",
-      emailPlaceholder: "E-mailová adresa",
-      notify: "SIGN UP",
-      subscribed: "JSI UVNITŘ. KEEP WINNING",
-      subscribedSub: "Early access + heslo ti přijde do e-mailu před dropem.",
-      consent: "Early access + heslo. Navíc novinky o dalších dropech. Odhlásit se můžeš kdykoli.",
       privacy: "Ochrana osobních údajů",
-      signupError: "NĚCO SE POKAZILO. ZKUS TO ZNOVU.",
       enterPassword: "ZADEJ HESLO",
       passwordPlaceholder: "HESLO",
-      unlock: "VSTOUPIT",
+      unlock: "ENTER",
       wrong: "ŠPATNÉ HESLO",
     },
     newsletter: {

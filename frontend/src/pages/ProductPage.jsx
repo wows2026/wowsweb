@@ -144,7 +144,7 @@ export default function ProductPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-          className="order-2 flex flex-col px-5 py-10 sm:px-8 lg:order-1 lg:py-14"
+          className="order-2 flex flex-col px-5 pt-6 sm:px-8 lg:order-1 lg:py-14"
         >
           <Link
             to="/collection"
@@ -154,7 +154,7 @@ export default function ProductPage() {
             <ArrowLeft className="h-3.5 w-3.5" />
             {t.product.back}
           </Link>
-          <div className="flex flex-1 flex-col justify-center py-8">
+          <div className="flex flex-1 flex-col justify-center pt-5 lg:py-8">
             <h1
               data-testid="product-title"
               className="font-display text-3xl leading-[1.02] font-extrabold tracking-tight uppercase sm:text-4xl"
@@ -199,7 +199,7 @@ export default function ProductPage() {
             )}
           </div>
           {images.length > 1 && (
-            <div className="flex flex-wrap justify-center gap-2 px-6 pb-12" data-testid="product-thumbnails">
+            <div className="flex flex-wrap justify-center gap-2 px-6 pb-4 lg:pb-12" data-testid="product-thumbnails">
               {images.map((src, i) => (
                 <button
                   key={src}
@@ -218,7 +218,7 @@ export default function ProductPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-          className="order-3 flex flex-col justify-center px-5 py-10 sm:px-8 lg:py-14"
+          className="order-3 flex flex-col justify-center px-5 pt-8 pb-10 sm:px-8 lg:py-14"
         >
           <p className="text-2xl font-extrabold tracking-tight" data-testid="product-price">
             {compareAt && <span className="mr-2 text-lg font-normal text-zinc-400 line-through">{formatPrice(compareAt, lang)}</span>}

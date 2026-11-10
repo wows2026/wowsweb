@@ -1,14 +1,31 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-// The section is a self-contained page in public/origin-story, embedded as delivered. It is .htm on purpose:
-// static hosts with clean URLs redirect .html files, and an SPA fallback then loads the whole site in the frame.
+const SECTION_DIR = "/origin-story/";
+
+// The section is a self-contained page in public/origin-story, embedded as delivered. It is read as text and
+// passed through srcDoc, so the host's content type can't turn it into a file download on phones.
 // Same-origin iframe: it is sized to its content, and its shop link goes to this site's collection.
 export default function OriginStory() {
   const navigate = useNavigate();
   // Close to the real height, so the page doesn't jump when the frame loads.
   const [height, setHeight] = useState(() => (window.innerWidth < 640 ? 1550 : 1130));
   const cleanup = useRef(null);
+  const [html, setHtml] = useState(null);
+
+  useEffect(() => {
+    let alive = true;
+    fetch(`${SECTION_DIR}index.html`)
+      .then((r) => r.text())
+      .then((text) => {
+        // A host's SPA fallback answers with the shop itself, which must not end up inside the frame.
+        if (alive && text.includes('id="origin-story"')) setHtml(text.replace("<head>", `<head><base href="${SECTION_DIR}">`));
+      })
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   useEffect(() => () => cleanup.current?.(), []);
 
@@ -43,13 +60,14 @@ export default function OriginStory() {
     };
   };
 
+  if (!html) return <div style={{ height }} className="bg-wino-band" data-testid="origin-story-loading" />;
+
   return (
     <iframe
       title="The Making of Origin Story"
-      src="/origin-story/section.htm"
+      srcDoc={html}
       onLoad={onLoad}
       scrolling="no"
-      loading="lazy"
       style={{ height }}
       className="bg-wino-band block w-full border-0"
       data-testid="origin-story"

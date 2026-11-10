@@ -77,7 +77,7 @@ export default function Hero() {
             className="mt-1 block"
           >
             {t.hero.line2}{" "}
-            <span className="relative inline-block px-4 align-baseline" data-testid="hero-script-word">
+            <span className="relative mt-5 block w-fit px-4 sm:mt-0 sm:inline-block sm:align-baseline" data-testid="hero-script-word">
               <span className="font-script text-[1.65em] leading-[0.8] normal-case tracking-normal">
                 {t.hero.scriptWord}
               </span>

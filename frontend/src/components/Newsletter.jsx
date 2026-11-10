@@ -56,7 +56,7 @@ export default function Newsletter() {
           transition={{ delay: 0.35, duration: 0.7 }}
           onSubmit={submit}
           data-testid="newsletter-form"
-          className="mt-10 flex max-w-xl flex-col gap-3 sm:flex-row"
+          className="mt-10 flex max-w-2xl flex-col gap-3 sm:flex-row"
         >
           <input
             type="email"
@@ -65,7 +65,7 @@ export default function Newsletter() {
             onChange={(e) => setEmail(e.target.value)}
             placeholder={t.newsletter.placeholder}
             data-testid="newsletter-email-input"
-            className="h-14 flex-1 border-2 border-black bg-transparent px-5 font-mono text-sm text-black placeholder-black/50 outline-none transition-colors focus:bg-white/40"
+            className="h-16 w-full border-2 border-black sm:w-auto sm:flex-1 bg-transparent px-6 font-mono text-base text-black placeholder-black/50 outline-none transition-colors focus:bg-white/40"
           />
           <motion.button
             type="submit"
@@ -73,7 +73,7 @@ export default function Newsletter() {
             whileTap={{ scale: 0.97 }}
             disabled={loading}
             data-testid="newsletter-submit-button"
-            className="group flex h-14 items-center justify-center gap-3 bg-black px-8 font-mono text-xs font-bold tracking-[0.2em] text-[#FFE600] transition-opacity disabled:opacity-60"
+            className="group flex h-16 items-center justify-center gap-3 bg-black px-8 font-mono text-xs font-bold tracking-[0.2em] text-[#FFE600] transition-opacity disabled:opacity-60"
           >
             {loading ? t.newsletter.loading : t.newsletter.button}
             <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
